@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, WebKit2
+from gi.repository import Gtk, Gdk, GdkPixbuf, WebKit2
 
 from eolie.define import El
 
@@ -50,6 +50,20 @@ class SidebarChild(Gtk.ListBoxRow):
 #######################
 # PRIVATE             #
 #######################
+    def __get_favicon(self, surface):
+        """
+            Resize surface to match favicon size
+        """
+        pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0,
+                                             surface.get_width(),
+                                             surface.get_height())
+        scaled = pixbuf.scale_simple(22, 22, GdkPixbuf.InterpType.BILINEAR)
+        del pixbuf
+        s = Gdk.cairo_surface_create_from_pixbuf(scaled,
+                                                 self.get_scale_factor(), None)
+        del scaled
+        return s
+
     def __on_load_changed(self, view, event):
         """
             Update label
@@ -62,10 +76,14 @@ class SidebarChild(Gtk.ListBoxRow):
         elif event == WebKit2.LoadEvent.FINISHED:
             self.__title.set_text(view.get_title())
             El().navigation.emit('title-changed', view.get_title())
+            self.__uri.set_text(view.get_uri())
+            El().navigation.emit('uri-changed', view.get_uri())
             if view.get_favicon() is None:
                 view.connect("notify::favicon", self.__on_notify_favicon)
             else:
-                self.__image.set_from_surface(view.get_favicon())
+                surface = self.__get_favicon(view.get_favicon())
+                self.__image.set_from_surface(surface)
+                del surface
 
     def __on_notify_favicon(self, view, pointer):
         """
@@ -77,7 +95,9 @@ class SidebarChild(Gtk.ListBoxRow):
             self.__image.set_from_icon_name('close-symbolic',
                                             Gtk.IconSize.MENU)
         else:
-            self.__image.set_from_surface(view.get_favicon())
+            surface = self.__get_favicon(view.get_favicon())
+            self.__image.set_from_surface(surface)
+            del surface
 
 
 class StackSidebar(Gtk.Grid):
