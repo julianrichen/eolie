@@ -25,7 +25,7 @@ class ToolbarTitle(Gtk.Bin):
         Gtk.Bin.__init__(self)
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
-        #builder.connect_signals(self)
+        # builder.connect_signals(self)
 
         self.add(builder.get_object('title'))
 

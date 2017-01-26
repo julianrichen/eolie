@@ -60,4 +60,3 @@ class Toolbar(Gtk.HeaderBar):
 #######################
 # PRIVATE             #
 #######################
-

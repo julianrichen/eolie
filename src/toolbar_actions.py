@@ -12,8 +12,6 @@
 
 from gi.repository import Gtk
 
-from eolie.define import El
-
 
 class ToolbarActions(Gtk.Bin):
     """
@@ -27,7 +25,7 @@ class ToolbarActions(Gtk.Bin):
         Gtk.Bin.__init__(self)
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarActions.ui')
-        #builder.connect_signals(self)
+        # builder.connect_signals(self)
 
         self.add(builder.get_object('actions'))
 
