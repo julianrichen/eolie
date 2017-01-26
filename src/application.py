@@ -12,12 +12,14 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('WebKit2', '4.0')
 from gi.repository import Gtk, Gio, GLib, Gdk
 
 from gettext import gettext as _
 
 from eolie.settings import Settings
 from eolie.window import Window
+from eolie.navigation_manager import NavigationManager
 
 
 class Application(Gtk.Application):
@@ -72,6 +74,7 @@ class Application(Gtk.Application):
         styleContext.add_provider_for_screen(screen, cssProvider,
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.settings = Settings.new()
+        self.navigation = NavigationManager()
 
     def do_startup(self):
         """

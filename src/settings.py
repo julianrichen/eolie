@@ -10,27 +10,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gio
 
 
-class ToolbarTitle(Gtk.Overlay):
+class Settings(Gio.Settings):
     """
-        Title toolbar
+        Eolie settings
     """
 
     def __init__(self):
         """
-            Init toolbar
+            Init settings
         """
-        Gtk.Overlay.__init__(self)
+        Gio.Settings.__init__(self)
 
-    def set_width(self, width):
+    def new():
         """
-            Set Gtk.Scale progress width
-            @param width as int
+            Return a new Settings object
         """
-        self.set_property("width_request", width)
-
-#######################
-# PRIVATE             #
-#######################
+        settings = Gio.Settings.new('org.gnome.Eolie')
+        settings.__class__ = Settings
+        return settings

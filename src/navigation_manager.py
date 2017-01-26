@@ -10,27 +10,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import GObject
 
 
-class ToolbarTitle(Gtk.Overlay):
+class NavigationManager(GObject.GObject):
     """
-        Title toolbar
+        Navigation manager
     """
+    __gsignals__ = {
+        'uri-changed': (GObject.SignalFlags.RUN_FIRST, None, (str,)),
+        'title-changed': (GObject.SignalFlags.RUN_FIRST, None, (str,))
+    }
 
     def __init__(self):
         """
-            Init toolbar
+            Init manager
         """
-        Gtk.Overlay.__init__(self)
-
-    def set_width(self, width):
-        """
-            Set Gtk.Scale progress width
-            @param width as int
-        """
-        self.set_property("width_request", width)
-
-#######################
-# PRIVATE             #
-#######################
+        GObject.GObject.__init__(self)
