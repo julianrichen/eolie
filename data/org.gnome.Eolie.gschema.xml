@@ -16,5 +16,10 @@
             <summary>Window maximized</summary>
             <description>Window maximized state.</description>
         </key>
+	<key type="i" name="paned-width">
+            <default>200</default>
+            <summary>INTERNAL</summary>
+            <description></description>
+        </key>
     </schema>
 </schemalist>

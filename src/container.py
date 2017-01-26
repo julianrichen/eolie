@@ -13,6 +13,7 @@
 from gi.repository import Gtk
 
 from eolie.stacksidebar import StackSidebar
+from eolie.define import El
 
 
 class Container(Gtk.Paned):
@@ -25,6 +26,8 @@ class Container(Gtk.Paned):
             Init container
         """
         Gtk.Paned.__init__(self)
+        self.set_position(
+            El().settings.get_value('paned-width').get_int32())
         self.__scrolled = Gtk.ScrolledWindow()
         self.__scrolled.set_hexpand(True)
         self.__scrolled.set_vexpand(True)

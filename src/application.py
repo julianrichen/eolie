@@ -13,7 +13,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
-from gi.repository import Gtk, Gio, GLib, Gdk
+from gi.repository import Gtk, Gio, GLib, Gdk, WebKit2
 
 from gettext import gettext as _
 
@@ -26,6 +26,13 @@ class Application(Gtk.Application):
     """
         Eolie application:
     """
+
+    if GLib.getenv("XDG_DATA_HOME") is None:
+        __LOCAL_PATH = GLib.get_home_dir() + "/.local/share/eolie"
+    else:
+        __LOCAL_PATH = GLib.getenv("XDG_DATA_HOME") + "/eolie"
+    __COOKIES_PATH = "%s/cookies.db" % __LOCAL_PATH
+    __FAVICONS_PATH = "%s/favicons" % __LOCAL_PATH
 
     def __init__(self):
         """
@@ -75,6 +82,21 @@ class Application(Gtk.Application):
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.settings = Settings.new()
         self.navigation = NavigationManager()
+        # Set some WebKit defaults
+        context = WebKit2.WebContext.get_default()
+        data_manager = WebKit2.WebsiteDataManager()
+        context.new_with_website_data_manager(data_manager)
+        context.set_cache_model(WebKit2.CacheModel.WEB_BROWSER)
+        d = Gio.File.new_for_path(self.__FAVICONS_PATH)
+        if not d.query_exists():
+            d.make_directory_with_parents()
+        context.set_favicon_database_directory(self.__FAVICONS_PATH)
+        cookie_manager = context.get_cookie_manager()
+        cookie_manager.set_accept_policy(
+                                     WebKit2.CookieAcceptPolicy.NO_THIRD_PARTY)
+        cookie_manager.set_persistent_storage(
+                                        self.__COOKIES_PATH,
+                                        WebKit2.CookiePersistentStorage.SQLITE)
 
     def do_startup(self):
         """

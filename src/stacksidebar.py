@@ -28,9 +28,10 @@ class SidebarChild(Gtk.ListBoxRow):
         self.__webview = None
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/SidebarChild.ui')
-        self.__label = builder.get_object('label')
-        self.__close = builder.get_object('close')
-        self.__label.set_label("Empty page")
+        self.__title = builder.get_object('title')
+        self.__uri = builder.get_object('uri')
+        self.__image = builder.get_object('image')
+        self.__title.set_label("Empty page")
         self.add_webview(webview)
         self.add(builder.get_object('widget'))
 
@@ -43,7 +44,8 @@ class SidebarChild(Gtk.ListBoxRow):
         if self.__webview is None and webview is not None:
             webview.connect('load-changed', self.__on_load_changed)
             self.__webview = webview
-            self.__close.show()
+            self.__image.set_from_icon_name('close-symbolic',
+                                            Gtk.IconSize.MENU)
 
 #######################
 # PRIVATE             #
@@ -55,10 +57,27 @@ class SidebarChild(Gtk.ListBoxRow):
             @parma event as WebKit2.LoadEvent
         """
         if event == WebKit2.LoadEvent.STARTED:
+            self.__uri.set_text(view.get_uri())
             El().navigation.emit('uri-changed', view.get_uri())
         elif event == WebKit2.LoadEvent.FINISHED:
-            self.__label.set_text(view.get_title())
+            self.__title.set_text(view.get_title())
             El().navigation.emit('title-changed', view.get_title())
+            if view.get_favicon() is None:
+                view.connect("notify::favicon", self.__on_notify_favicon)
+            else:
+                self.__image.set_from_surface(view.get_favicon())
+
+    def __on_notify_favicon(self, view, pointer):
+        """
+            Set favicon
+            @param view as WebKit2.WebView
+            @param pointer as GParamPointer
+        """
+        if view.get_favicon() is None:
+            self.__image.set_from_icon_name('close-symbolic',
+                                            Gtk.IconSize.MENU)
+        else:
+            self.__close.set_from_surface(view.get_favicon())
 
 
 class StackSidebar(Gtk.Grid):

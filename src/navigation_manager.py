@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import GObject
+from gi.repository import GObject, WebKit2
 
 
 class NavigationManager(GObject.GObject):
@@ -27,3 +27,4 @@ class NavigationManager(GObject.GObject):
             Init manager
         """
         GObject.GObject.__init__(self)
+        self.favicons = WebKit2.FaviconDatabase()
