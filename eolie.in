@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+import sys
+import signal
+import os
+import locale
+import gettext
+
+if 'LOLLYPOP_TRACE' in os.environ:
+    from pycallgraph import PyCallGraph
+    from pycallgraph.output import GraphvizOutput
+# Make sure we'll find the pygobject module, even in JHBuild
+sys.path.insert(1, '@pyexecdir@')
+# Make sure we'll find the lollypop modules, even in JHBuild
+sys.path.insert(1, '@pythondir@')
+
+from gi.repository import Gio
+
+localedir = '@localedir@'
+pkgdatadir = '@pkgdatadir@'
+
+from lollypop.application import Application
+
+def install_excepthook():
+    """ Make sure we exit when an unhandled exception occurs. """
+    from gi.repository import Gtk
+    old_hook = sys.excepthook
+
+    def new_hook(etype, evalue, etb):
+        old_hook(etype, evalue, etb)
+        while Gtk.main_level():
+            Gtk.main_quit()
+        sys.exit()
+    sys.excepthook = new_hook
+
+if __name__ == "__main__":
+    install_excepthook()
+    
+    locale.bindtextdomain('lollypop', localedir)
+    locale.textdomain('lollypop')
+    gettext.bindtextdomain('lollypop', localedir)
+    gettext.textdomain('lollypop')
+
+    resource = Gio.resource_load(os.path.join(pkgdatadir, 'lollypop.gresource'))
+    Gio.Resource._register(resource)
+
+    app = Application()
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    if 'LOLLYPOP_TRACE' in os.environ:
+        graphviz = GraphvizOutput()
+        graphviz.output_file = 'lollypop.png'
+        with PyCallGraph(output=graphviz):
+            exit_status = app.run(sys.argv)
+            sys.exit(exit_status)
+    else:
+        exit_status = app.run(sys.argv)
+        sys.exit(exit_status)
