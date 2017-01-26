@@ -77,7 +77,7 @@ class SidebarChild(Gtk.ListBoxRow):
             self.__image.set_from_icon_name('close-symbolic',
                                             Gtk.IconSize.MENU)
         else:
-            self.__close.set_from_surface(view.get_favicon())
+            self.__image.set_from_surface(view.get_favicon())
 
 
 class StackSidebar(Gtk.Grid):
