@@ -1,21 +1,16 @@
 ACLOCAL_AMFLAGS = -I m4
 NULL =
 
-bin_SCRIPTS = lollypop
+bin_SCRIPTS = eolie
 
-dist_bin_SCRIPTS = lollypop-cli\
-                   rhythmbox2lollypop
-
-SUBDIRS = src data po help search-provider
+SUBDIRS = src data
 
 EXTRA_DIST = \
-	lollypop.in\
-	lollypop-cli.in
+	eolie.in\
 	$(NULL)
 
 CLEANFILES = \
 	$(bin_SCRIPTS)\
-        lollypop-cli\
 	$(NULL)
 
 MAINTAINERCLEANFILES = \
@@ -39,7 +34,7 @@ GITIGNOREFILES = \
 	m4 \
 	$(NULL)
 
-lollypop: lollypop.in Makefile
+eolie: eolie.in Makefile
 	$(AM_V_GEN)sed						\
 		-e s!\@srcdir\@!$(abs_top_srcdir)!	\
 		-e s!\@prefix\@!$(prefix)!		\
@@ -56,24 +51,7 @@ lollypop: lollypop.in Makefile
 		< $< > $@
 	chmod a+x $@
 
-lollypop-cli: lollypop-cli.in Makefile
-	$(AM_V_GEN)sed						\
-		-e s!\@srcdir\@!$(abs_top_srcdir)!	\
-		-e s!\@prefix\@!$(prefix)!		\
-		-e s!\@datadir\@!$(datadir)!		\
-		-e s!\@pkgdatadir\@!$(pkgdatadir)!	\
-		-e s!\@libexecdir\@!$(libexecdir)!	\
-		-e s!\@libdir\@!$(libdir)!		\
-		-e s!\@pkglibdir\@!$(pkglibdir)!	\
-		-e s!\@localedir\@!$(localedir)!	\
-		-e s!\@pythondir\@!$(pythondir)!	\
-		-e s!\@pyexecdir\@!$(pyexecdir)!	\
-		-e s!\@PACKAGE\@!$(PACKAGE)!		\
-		-e s!\@VERSION\@!$(VERSION)!		\
-		< $< > $@
-	chmod a+x $@
-
-all-local: lollypop lollypop-cli
+all-local: eolie
 
 -include $(top_srcdir)/git.mk
 
