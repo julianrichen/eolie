@@ -10,6 +10,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gio
+from gi.repository import Gtk
 
-El = Gio.Application.get_default
+
+class ToolbarTitle(Gtk.Bin):
+    """
+        Title toolbar
+    """
+
+    def __init__(self):
+        """
+            Init toolbar
+        """
+        Gtk.Bin.__init__(self)
+        builder = Gtk.Builder()
+        builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
+        #builder.connect_signals(self)
+
+        self.add(builder.get_object('title'))
+
+    def set_width(self, width):
+        """
+            Set Gtk.Scale progress width
+            @param width as int
+        """
+        self.set_property("width_request", width)
+
+#######################
+# PRIVATE             #
+#######################

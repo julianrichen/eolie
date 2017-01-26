@@ -13,6 +13,7 @@
 from gi.repository import Gtk
 
 from eolie.define import El
+from eolie.toolbar import Toolbar
 
 
 class Window(Gtk.ApplicationWindow):
@@ -32,6 +33,24 @@ class Window(Gtk.ApplicationWindow):
                                        application=El(),
                                        title="Eolie")
 
+        self.__setup_content()
+
 ############
 # Private  #
 ############
+    def __setup_content(self):
+        """
+            Setup window content
+        """
+        self.set_default_icon_name('web-browser')
+        vgrid = Gtk.Grid()
+        vgrid.set_orientation(Gtk.Orientation.VERTICAL)
+        vgrid.show()
+        self.__toolbar = Toolbar()
+        self.__toolbar.show()
+        if El().prefers_app_menu():
+            self.set_titlebar(self.__toolbar)
+            self.__toolbar.set_show_close_button(True)
+        else:
+            vgrid.add(self.__toolbar)
+        self.add(vgrid)

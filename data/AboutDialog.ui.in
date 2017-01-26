@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.20.0 -->
-<interface domain="lollypop">
+<interface domain="eolie">
   <requires lib="gtk+" version="3.12"/>
   <object class="GtkAboutDialog" id="about_dialog">
     <property name="can_focus">False</property>
     <property name="modal">True</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">normal</property>
-    <property name="program_name">Lollypop</property>
+    <property name="program_name">Eolie</property>
     <property name="version">@PACKAGE_VERSION@</property>
-    <property name="copyright">Copyright © 2014-2016 Cédric Bellegarde</property>
-    <property name="comments" translatable="yes">A music player for GNOME.</property>
+    <property name="copyright">Copyright © 2016-2017 Cédric Bellegarde</property>
+    <property name="comments" translatable="yes">A web browser for GNOME.</property>
     <property name="website">@PACKAGE_URL@</property>
-    <property name="website_label" translatable="yes">Visit Lollypop website</property>
+    <property name="website_label" translatable="yes">Visit Eolie website</property>
     <property name="authors">Cédric Bellegarde &lt;cedric.bellegarde@adishatz.org&gt;
 </property>
     <property name="translator_credits" translatable="yes" context="Translation credits here, put your name here!" comments="Replace me with your names">Cédric Bellegarde &lt;cedric.bellegarde@adishatz.org&gt;</property>
-    <property name="artists"> Reda Lazri (Lollypop icon)
-https://www.elegantthemes.com (Spotify icon)
-http://simpleicon.com (Itunes icon)
-http://www.onlinewebfonts.com/icon (Last.fm icon)
+    <property name="artists">
     </property>
-    <property name="logo_icon_name">org.gnome.Lollypop</property>
+    <property name="logo_icon_name">web-browser</property>
     <property name="license_type">gpl-3-0</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="aboutdialog-vbox1">
@@ -48,10 +45,14 @@ http://www.onlinewebfonts.com/icon (Last.fm icon)
             <property name="column_spacing">5</property>
             <child>
               <object class="GtkLabel" id="donation">
-                <property name="label" translatable="yes">Donations:</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Donations:</property>
               </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
             </child>
             <child>
               <object class="GtkLinkButton" id="flattr">
@@ -60,8 +61,12 @@ http://www.onlinewebfonts.com/icon (Last.fm icon)
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
-                <property name="uri">https://flattr.com/profile/lollypop</property>
+                <property name="uri">https://flattr.com/profile/eolie</property>
               </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+              </packing>
             </child>
             <child>
               <object class="GtkLinkButton" id="paypal">
@@ -70,12 +75,24 @@ http://www.onlinewebfonts.com/icon (Last.fm icon)
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
-                <property name="uri">https://www.paypal.me/lollypopgnome</property>
+                <property name="uri">https://www.paypal.me/eolie</property>
               </object>
+              <packing>
+                <property name="left_attach">2</property>
+                <property name="top_attach">0</property>
+              </packing>
             </child>
-          </object> 
-        </child>      
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
       </object>
+    </child>
+    <child>
+      <placeholder/>
     </child>
   </object>
 </interface>

@@ -75,13 +75,13 @@ Gtk.ListBoxRow .menu-button:hover {
     background-image: none;
 }
 
-.lollypop-title {
+.eolie-title {
     font-weight: bold;
     font-size: smaller;
     padding: 0px 12px;
 }
 
-.lollypop-subtitle {
+.eolie-subtitle {
     font-size: smaller;
     padding: 0px 12px;
 }

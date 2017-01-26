@@ -10,6 +10,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gio
+from gi.repository import Gtk
 
-El = Gio.Application.get_default
+from eolie.define import El
+
+
+class ToolbarActions(Gtk.Bin):
+    """
+        Actions toolbar
+    """
+
+    def __init__(self):
+        """
+            Init toolbar
+        """
+        Gtk.Bin.__init__(self)
+        builder = Gtk.Builder()
+        builder.add_from_resource('/org/gnome/Eolie/ToolbarActions.ui')
+        #builder.connect_signals(self)
+
+        self.add(builder.get_object('actions'))
+
+        self._prev_btn = builder.get_object('previous_button')
+        self._play_btn = builder.get_object('play_button')
+        self._next_btn = builder.get_object('next_button')
+
+#######################
+# PRIVATE             #
+#######################

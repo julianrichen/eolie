@@ -10,6 +10,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gio
+from gi.repository import Gtk, Gio, GLib
 
-El = Gio.Application.get_default
+from gettext import gettext as _
+
+class ToolbarEnd(Gtk.Bin):
+    """
+        Toolbar end
+    """
+
+    def __init__(self):
+        """
+            Init toolbar
+        """
+        Gtk.Bin.__init__(self)
+        builder = Gtk.Builder()
+        builder.add_from_resource('/org/gnome/Eolie/ToolbarEnd.ui')
+        #builder.connect_signals(self)
+
+        self.add(builder.get_object('end'))
+
+#######################
+# PROTECTED           #
+#######################
+
+#######################
+# PRIVATE             #
+#######################
+

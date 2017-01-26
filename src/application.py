@@ -97,7 +97,7 @@ class Application(Gtk.Application):
 
     def quit(self):
         """
-            Quit lollypop
+            Quit Eolie
         """
         self.window.destroy()
 
