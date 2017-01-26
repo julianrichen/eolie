@@ -1,0 +1,193 @@
+# Copyright (c) 2014-2016 Cedric Bellegarde <cedric.bellegarde@adishatz.org>
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gio, GLib, Gdk
+
+from gettext import gettext as _
+
+from eolie.window import Window
+
+
+class Application(Gtk.Application):
+    """
+        Eolie application:
+    """
+
+    def __init__(self):
+        """
+            Create application
+        """
+        Gtk.Application.__init__(
+                            self,
+                            application_id='org.gnome.Eolie',
+                            flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
+        self.set_property('register-session', True)
+        # Ideally, we will be able to delete this once Flatpak has a solution
+        # for SSL certificate management inside of applications.
+        if GLib.file_test("/app", GLib.FileTest.EXISTS):
+            paths = ["/etc/ssl/certs/ca-certificates.crt",
+                     "/etc/pki/tls/cert.pem",
+                     "/etc/ssl/cert.pem"]
+            for path in paths:
+                if GLib.file_test(path, GLib.FileTest.EXISTS):
+                    GLib.setenv('SSL_CERT_FILE', path, True)
+                    break
+
+        self.window = None
+        self.debug = False
+        GLib.set_application_name('Eolie')
+        GLib.set_prgname('eolie')
+        self.connect('activate', self.__on_activate)
+        self.register(None)
+        if self.get_is_remote():
+            Gdk.notify_startup_complete()
+
+    def init(self):
+        """
+            Init main application
+        """
+        self.__is_fs = False
+        if Gtk.get_minor_version() > 18:
+            cssProviderFile = Gio.File.new_for_uri(
+                'resource:///org/gnome/Eolie/application.css')
+        else:
+            cssProviderFile = Gio.File.new_for_uri(
+                'resource:///org/gnome/Eolie/application-legacy.css')
+        cssProvider = Gtk.CssProvider()
+        cssProvider.load_from_file(cssProviderFile)
+        screen = Gdk.Screen.get_default()
+        styleContext = Gtk.StyleContext()
+        styleContext.add_provider_for_screen(screen, cssProvider,
+                                             Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+    def do_startup(self):
+        """
+            Init application
+        """
+        Gtk.Application.do_startup(self)
+
+        if not self.window:
+            self.init()
+            menu = self.__setup_app_menu()
+            if self.prefers_app_menu():
+                self.set_app_menu(menu)
+                self.window = Window()
+            else:
+                self.window = Window()
+                self.window.setup_menu(menu)
+            self.window.show()
+
+    def prepare_to_exit(self, action=None, param=None, exit=True):
+        """
+            Save window position and view
+        """
+        if exit:
+            self.quit()
+
+    def quit(self):
+        """
+            Quit lollypop
+        """
+        self.window.destroy()
+
+#######################
+# PRIVATE             #
+#######################
+    def __on_activate(self, application):
+        """
+            Call default handler
+            @param application as Gio.Application
+        """
+        self.window.present()
+
+    def __settings_dialog(self, action=None, param=None):
+        """
+            Show settings dialog
+            @param action as Gio.SimpleAction
+            @param param as GLib.Variant
+        """
+        pass
+
+    def __about(self, action, param):
+        """
+            Setup about dialog
+            @param action as Gio.SimpleAction
+            @param param as GLib.Variant
+        """
+        builder = Gtk.Builder()
+        builder.add_from_resource('/org/gnome/Eolie/AboutDialog.ui')
+        about = builder.get_object('about_dialog')
+        about.set_transient_for(self.window)
+        about.connect("response", self.__about_response)
+        about.show()
+
+    def __shortcuts(self, action, param):
+        """
+            Show help in yelp
+            @param action as Gio.SimpleAction
+            @param param as GLib.Variant
+        """
+        try:
+            builder = Gtk.Builder()
+            builder.add_from_resource('/org/gnome/Eolie/Shortcuts.ui')
+            builder.get_object('shortcuts').set_transient_for(self.window)
+            builder.get_object('shortcuts').show()
+        except:  # GTK < 3.20
+            self.__help(action, param)
+
+    def __help(self, action, param):
+        """
+            Show help in yelp
+            @param action as Gio.SimpleAction
+            @param param as GLib.Variant
+        """
+        try:
+            Gtk.show_uri(None, "help:eolie", Gtk.get_current_event_time())
+        except:
+            print(_("Eolie: You need to install yelp."))
+
+    def __about_response(self, dialog, response_id):
+        """
+            Destroy about dialog when closed
+            @param dialog as Gtk.Dialog
+            @param response id as int
+        """
+        dialog.destroy()
+
+    def __setup_app_menu(self):
+        """
+            Setup application menu
+            @return menu as Gio.Menu
+        """
+        builder = Gtk.Builder()
+        builder.add_from_resource('/org/gnome/Eolie/Appmenu.ui')
+        menu = builder.get_object('app-menu')
+
+        aboutAction = Gio.SimpleAction.new('about', None)
+        aboutAction.connect('activate', self.__about)
+        self.add_action(aboutAction)
+
+        shortcutsAction = Gio.SimpleAction.new('shortcuts', None)
+        shortcutsAction.connect('activate', self.__shortcuts)
+        self.add_action(shortcutsAction)
+
+        helpAction = Gio.SimpleAction.new('help', None)
+        helpAction.connect('activate', self.__help)
+        self.add_action(helpAction)
+
+        quitAction = Gio.SimpleAction.new('quit', None)
+        quitAction.connect('activate', self.prepare_to_exit)
+        self.add_action(quitAction)
+
+        return menu

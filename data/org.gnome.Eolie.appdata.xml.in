@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+ <id type="desktop">org.gnome.Eolie.desktop</id>
+ <licence>CC0</licence>
+ <_name>Lollypop</_name>
+ <_summary>Web browser</_summary>
+ <description>
+ </description>
+ <screenshots>
+ </screenshots>
+ <url type="homepage">https://github.com/gnumdk/eolie</url>
+ <updatecontact>cedric.bellegarde@adishatz.org</updatecontact>
+</application>

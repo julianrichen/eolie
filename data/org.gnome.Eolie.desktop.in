@@ -1,0 +1,10 @@
+[Desktop Entry]
+_Name=Eolie
+_GenericName=Web browser
+_Comment=Web browser
+Icon=web-browser
+Exec=eolie %U
+Terminal=false
+Type=Application
+Categories=GNOME;
+StartupNotify=true

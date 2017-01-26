@@ -6,12 +6,12 @@ import os
 import locale
 import gettext
 
-if 'LOLLYPOP_TRACE' in os.environ:
+if 'eolie_TRACE' in os.environ:
     from pycallgraph import PyCallGraph
     from pycallgraph.output import GraphvizOutput
 # Make sure we'll find the pygobject module, even in JHBuild
 sys.path.insert(1, '@pyexecdir@')
-# Make sure we'll find the lollypop modules, even in JHBuild
+# Make sure we'll find the eolie modules, even in JHBuild
 sys.path.insert(1, '@pythondir@')
 
 from gi.repository import Gio
@@ -19,7 +19,7 @@ from gi.repository import Gio
 localedir = '@localedir@'
 pkgdatadir = '@pkgdatadir@'
 
-from lollypop.application import Application
+from eolie.application import Application
 
 def install_excepthook():
     """ Make sure we exit when an unhandled exception occurs. """
@@ -36,19 +36,19 @@ def install_excepthook():
 if __name__ == "__main__":
     install_excepthook()
     
-    locale.bindtextdomain('lollypop', localedir)
-    locale.textdomain('lollypop')
-    gettext.bindtextdomain('lollypop', localedir)
-    gettext.textdomain('lollypop')
+    locale.bindtextdomain('eolie', localedir)
+    locale.textdomain('eolie')
+    gettext.bindtextdomain('eolie', localedir)
+    gettext.textdomain('eolie')
 
-    resource = Gio.resource_load(os.path.join(pkgdatadir, 'lollypop.gresource'))
+    resource = Gio.resource_load(os.path.join(pkgdatadir, 'eolie.gresource'))
     Gio.Resource._register(resource)
 
     app = Application()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
-    if 'LOLLYPOP_TRACE' in os.environ:
+    if 'EOLIE_TRACE' in os.environ:
         graphviz = GraphvizOutput()
-        graphviz.output_file = 'lollypop.png'
+        graphviz.output_file = 'eolie.png'
         with PyCallGraph(output=graphviz):
             exit_status = app.run(sys.argv)
             sys.exit(exit_status)

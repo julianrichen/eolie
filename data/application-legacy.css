@@ -1,0 +1,373 @@
+GtkWidget {
+	outline-width: 0px;
+    text-shadow: none;
+}
+
+GtkTreeView {
+    padding: 2px 2px 2px 2px;
+}
+
+GtkTreeView:selected:hover {
+        background-color: shade(@theme_selected_bg_color, 0.9);
+        color: @theme_selected_fg_color;
+}
+
+GtkTreeView:hover {
+    background-color: alpha(@theme_fg_color, 0.05);
+    color: @theme_fg_color;
+}
+
+GtkTreeView.separator {
+    color: alpha(@theme_fg_color, 0.1);
+}
+
+GtkTreeView .image{
+    color: alpha(@theme_fg_color, 0.8);
+}
+
+GtkTreeView .image:backdrop{
+    color: alpha(@theme_fg_color, 0.6);
+}
+
+GtkTreeView .image:selected{
+    color: @theme_selected_fg_color;
+}
+
+Gtk.ListBoxRow .loved-button {
+	border-color: transparent;
+	background-color: transparent;
+	color: transparent;
+}
+
+Gtk.ListBoxRow .loved-button:hover {
+	border-color: alpha(@theme_fg_color, 0.1);
+}
+
+Gtk.ListBoxRow .menu-button {
+	border-color: transparent;
+	background-color: transparent;
+	color: transparent;
+}
+
+Gtk.ListBoxRow .menu-button:hover {
+	border-color: alpha(@theme_fg_color, 0.1);
+}
+
+.box-shadow {
+    box-shadow: 1px 1px 5px 5px alpha(black, 0.4);
+}
+
+.loading {
+    background-color: shade(@theme_bg_color, 1.2);
+    border: 1px solid @theme_bg_color;
+}
+
+.selected {
+    color: @theme_selected_bg_color;
+}
+
+.osd-popover {
+    opacity: 0.95;
+}
+
+.no-border {
+    border: none;
+    background-image: none;
+}
+
+.lollypop-title {
+    font-weight: bold;
+    font-size: smaller;
+    padding: 0px 12px;
+}
+
+.lollypop-subtitle {
+    font-size: smaller;
+    padding: 0px 12px;
+}
+
+.white {
+    background-color: white;
+    border-radius: 4px;
+}
+
+.black {
+    background-color: black;
+}
+
+.header-borders {
+    border: 1px solid shade(@theme_bg_color, 0.7);
+    border-radius: 4px;
+    border-top: none;
+    border-left: none;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    background-color: @theme_bg_color;
+}
+
+.header {
+    border: 1px solid alpha(@theme_bg_color, 0);
+    border-radius: 4px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.header:hover {
+    border: 1px solid shade(@theme_bg_color, 0.7);
+    border-radius: 4px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    background-color: shade(@theme_bg_color, 0.95);
+}
+
+.header-dim {
+    color: alpha(@theme_fg_color, 0.7); 
+}
+
+.cover-frame {
+    border: 1px solid shade(@theme_bg_color, 0.7);
+    background-color: shade(@theme_bg_color, 1.5);
+    padding: 3px;
+    border-radius: 2px;
+}
+
+.small-cover-frame {
+    border-radius: 1px;
+    border: 1px solid shade(@theme_bg_color, 0.7);
+}
+
+.small-cover-web {
+    border-radius: 1px;
+    border: 1px solid alpha(red, 0.5);
+}
+
+.cover-frame-web {
+    border-color: alpha(red, 0.3);
+    background-color: alpha(red, 0.3);
+}
+
+.cover-frame-selected {
+    border-color: @theme_selected_bg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+.artwork-icon {
+    border: 2px solid #bebebe;
+    background-color: white;
+    color: #bebebe;
+    border-radius: 20px;
+}
+
+.rounded-icon {
+    transition: 70ms linear;
+    border: 3px solid white;
+    background-color: black;
+    color: white;
+    padding: 12px;
+    opacity: 0.7;
+    border-radius: 30px;
+}
+
+.rounded-icon-small {
+    transition: 70ms linear;
+    border: 2px solid white;
+    background-color: black;
+    color: white;
+    opacity: 0.7;
+    padding: 5px;
+    border-radius: 16px;
+}
+
+.squared-icon {
+    transition:70ms linear;
+    border: 2px solid white;
+    background-color: black;
+    color: white;
+    opacity: 0.7;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.no-padding {
+    padding: 0px;
+}
+
+.fastscroll {
+    padding: 2px;
+    background-color: @theme_bg_color;
+    border: 1px solid shade(@theme_bg_color, 0.7);
+    border-right: none;
+    border-radius: 2px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.queued {
+    border-radius: 5px;
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+.drag-up {
+    background-image: -gtk-gradient (linear,
+                                     left top,
+                                     left bottom,
+                                     from (@theme_bg_color),
+                                     color-stop (0.9, @theme_bg_color),
+                                     to (@theme_selected_bg_color));
+}
+
+.drag-down {
+    background-image: -gtk-gradient (linear,
+                                     left top,
+                                     left bottom,
+                                     from (@theme_selected_bg_color),
+                                     color-stop (0.1, @theme_bg_color),
+                                     to (@theme_bg_color));
+}
+
+.trackswidget {
+	background-color: transparent;
+}
+
+.trackrow {
+    padding: 0px;
+	background-color: transparent;
+  	color: inherit;
+}
+
+.trackrow:hover {
+    border-radius: 5px;
+    outline-radius: 5px;
+	background-color: alpha(@theme_fg_color, 0.05);
+  	color: inherit;
+}
+
+.trackrow:selected {
+    border-radius: 5px;
+    outline-radius: 5px;
+	background-color: alpha(@theme_fg_color, 0.07);
+  	color: inherit;
+}
+
+.trackrowplaying {
+    border-radius: 5px;
+    outline-radius: 5px;
+    padding: 0px;
+	background-color: alpha(@theme_fg_color, 0.07);
+  	color: inherit;
+}
+
+.trackrowplaying .loved-button {
+	background-color: transparent;
+	border-color: transparent;
+	color: transparent;
+}
+
+.trackrowplaying:hover .loved-button {
+	border-color: transparent;
+	color: inherit;
+}
+
+.trackrowplaying:hover .loved-button:hover {
+	border-color: alpha(#000000, 0.1);
+}
+
+.trackrowplaying .menu-button {
+	background-color: transparent;
+    border-color: transparent;
+  	color: transparent;
+}
+
+.trackrowplaying:hover .menu-button {
+	border-color: transparent;
+  	color: inherit;
+}
+
+.trackrowplaying:hover .menu-button:hover {
+	border-color: alpha(#000000, 0.1);
+}
+
+.trackrow .loved-button {
+	border-color: transparent;
+	background-color: transparent;
+	color: transparent;
+}
+
+.trackrow .menu-button {
+	border-color: transparent;
+	background-color: transparent;
+	color: transparent;
+}
+
+.trackrow:hover .loved-button {
+	color: inherit;
+}
+
+.trackrow:hover .menu-button {
+  	color: inherit;
+}
+
+.trackrow:hover .loved-button:hover {
+	border-color: alpha(@theme_fg_color, 0.1);
+}
+
+.trackrow:hover .menu-button:hover {
+	border-color: alpha(@theme_fg_color, 0.1);
+}
+
+.album-menu-selected .album-menu-button{
+	border-color: alpha(@theme_fg_color, 0.1);
+  	color: inherit;
+}
+
+.track-menu-selected {
+	background-color: alpha(@theme_fg_color, 0.03);
+  	color: inherit;
+}
+
+.track-menu-selected .track-loved-button {
+	border-color: alpha(@theme_fg_color, 0.1);
+	color: inherit;
+}
+
+.track-menu-selected .track-menu-button {
+	border-color: alpha(@theme_fg_color, 0.1);
+  	color: inherit;
+}
+
+.menu-button {
+	box-shadow: none;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	background-image: none;
+	border-style: solid;
+	border-image-source: none;
+    border-bottom-width: 1px;
+    border-top-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-color: transparent;
+    color: inherit;
+}
+
+.menu-button:hover {
+    border-color: alpha(@theme_fg_color, 0.1);
+  	color: inherit;
+}
+
+.loved-button {
+	box-shadow: none;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	background-image: none;
+	color: inherit;
+}
+
+.loved-button:hover {
+	border-color: alpha(@theme_fg_color, 0.1);
+	color: inherit;
+}
