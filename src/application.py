@@ -16,6 +16,7 @@ from gi.repository import Gtk, Gio, GLib, Gdk
 
 from gettext import gettext as _
 
+from eolie.settings import Settings
 from eolie.window import Window
 
 
@@ -70,6 +71,7 @@ class Application(Gtk.Application):
         styleContext = Gtk.StyleContext()
         styleContext.add_provider_for_screen(screen, cssProvider,
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        self.settings = Settings.new()
 
     def do_startup(self):
         """

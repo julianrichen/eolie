@@ -6,6 +6,7 @@
     <file>application.css</file>
     <file>application-legacy.css</file>
     <file compressed="true" preprocess="xml-stripblanks">Shortcuts.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">SidebarChild.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ToolbarActions.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ToolbarEnd.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ToolbarInfo.ui</file>
