@@ -48,6 +48,6 @@ class Container(Gtk.Paned):
         from eolie.web_view import WebView
         view = WebView()
         view.show()
-        self.__stack.add(view)
+        self.__stack_sidebar.add_child(view)
         if uri is not None:
             view.load_uri(uri)

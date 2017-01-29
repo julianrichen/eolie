@@ -38,6 +38,9 @@ class Window(Gtk.ApplicationWindow):
         self.connect('window-state-event', self.__on_window_state_event)
         self.connect('configure-event', self.__on_configure_event)
         self.__container.add_web_view("https://linuxfr.org")
+        self.__container.add_web_view("https://github.com")
+        self.__container.add_web_view("https://archlinux.org")
+        self.__container.add_web_view("https://imgur.com")
 
     def setup_window(self):
         """

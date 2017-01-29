@@ -11,6 +11,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, WebKit2
+import cairo
 
 from eolie.define import El
 
@@ -19,12 +20,12 @@ class SidebarChild(Gtk.ListBoxRow):
     """
         A Sidebar Child
     """
-    __HEIGHT = 50
+    __HEIGHT = 40
 
     def __init__(self, webview=None):
         """
             Init child
-            @param web as WebKit2.WebView
+            @param web as WebView
         """
         Gtk.ListBoxRow.__init__(self)
         self.__webview = None
@@ -39,12 +40,13 @@ class SidebarChild(Gtk.ListBoxRow):
         self.add_webview(webview)
         self.add(builder.get_object('widget'))
         webview.connect("notify::favicon", self.__on_notify_favicon)
+        self.get_style_context().add_class('sidebar-item')
 
     def add_webview(self, webview):
         """
             Add a webview
             Do nothing if already exists
-            @param webview as WebKit2.WebView
+            @param webview as WebView
         """
         if self.__webview is None and webview is not None:
             webview.connect('load-changed', self.__on_load_changed)
@@ -106,32 +108,38 @@ class SidebarChild(Gtk.ListBoxRow):
         """
             Set webpage preview
         """
-        window = self.__webview.get_window()
-        if window is not None:
-            wanted_height = self.__webview.get_allocated_width() *\
-                self.get_allocated_height() / \
-                self.get_allocated_width()
-            pixbuf = Gdk.pixbuf_get_from_window(
-                                        window,
-                                        0, 0,
-                                        self.__webview.get_allocated_width(),
-                                        wanted_height)
-            scaled = pixbuf.scale_simple(self.get_allocated_width() - 6,
-                                         self.get_allocated_height() - 3,
-                                         GdkPixbuf.InterpType.BILINEAR)
-            del pixbuf
-            surface = Gdk.cairo_surface_create_from_pixbuf(
-                                                   scaled,
-                                                   self.get_scale_factor(),
-                                                   None)
-            del scaled
-            self.__image.set_from_surface(surface)
-            del surface
+        self.__webview.get_snapshot(
+                                WebKit2.SnapshotRegion.FULL_DOCUMENT,
+                                WebKit2.SnapshotOptions.NONE,
+                                None,
+                                self.__on_snapshot)
+
+    def __on_snapshot(self, view, result):
+        """
+            Set snapshot on main image
+            @param view as WebView
+            @param result as Gio.AsyncResult
+        """
+        try:
+            snapshot = self.__webview.get_snapshot_finish(result)
+        except:
+            return
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+                                     self.get_allocated_width() - 10,
+                                     self.__HEIGHT)
+        context = cairo.Context(surface)
+        context.set_source_surface(snapshot)
+        factor = self.get_allocated_width() /\
+            snapshot.get_width()
+        context.scale(factor, factor)
+        self.__webview.draw(context)
+        self.__image.set_from_surface(surface)
+        del surface
 
     def __on_load_changed(self, view, event):
         """
             Update label
-            @param view as WebKit2.WebView
+            @param view as WebView
             @parma event as WebKit2.LoadEvent
         """
         if event == WebKit2.LoadEvent.STARTED:
@@ -153,7 +161,7 @@ class SidebarChild(Gtk.ListBoxRow):
     def __on_notify_favicon(self, view, pointer):
         """
             Set favicon
-            @param view as WebKit2.WebView
+            @param view as WebView
             @param pointer as GParamPointer => unused
         """
         if view.get_favicon() is None:
@@ -173,25 +181,39 @@ class StackSidebar(Gtk.Grid):
             @param stack as Gtk.Stack
         """
         Gtk.Grid.__init__(self)
+        self.__children = []
+        self.__stack = stack
         self.set_orientation(Gtk.Orientation.VERTICAL)
         self.__scrolled = Gtk.ScrolledWindow()
         self.__scrolled.set_vexpand(True)
         self.__scrolled.show()
         self.__listbox = Gtk.ListBox.new()
+        self.__listbox.set_activate_on_single_click(True)
+        self.__listbox.set_selection_mode(Gtk.SelectionMode.NONE)
         self.__listbox.show()
         self.__scrolled.add(self.__listbox)
         self.add(self.__scrolled)
-        stack.connect('add', self.__on_stack_add)
 
-#######################
-# PRIVATE             #
-#######################
-    def __on_stack_add(self, stack, widget):
+    def add_child(self, widget):
         """
             Add child to sidebar
-            @param stack as Gtk.Stack
             @param widget as Gtk.Widget
         """
+        self.__children.append(widget)
         child = SidebarChild(widget)
         child.show()
         self.__listbox.add(child)
+        if self.__stack.get_visible_child() is None:
+            self.__stack.add(widget)
+        else:
+            window = Gtk.OffscreenWindow.new()
+            scrolled = Gtk.ScrolledWindow()
+            scrolled.set_hexpand(True)
+            scrolled.set_vexpand(True)
+            scrolled.add(widget)
+            scrolled.set_size_request(1000, 1000)
+            window.add(scrolled)
+            window.show_all()
+#######################
+# PRIVATE             #
+#######################
