@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, Gdk, GdkPixbuf, WebKit2
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, WebKit2
 
 from eolie.define import El
 
@@ -19,6 +19,8 @@ class SidebarChild(Gtk.ListBoxRow):
     """
         A Sidebar Child
     """
+    __HEIGHT = 50
+
     def __init__(self, webview=None):
         """
             Init child
@@ -28,12 +30,15 @@ class SidebarChild(Gtk.ListBoxRow):
         self.__webview = None
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/SidebarChild.ui')
+        builder.connect_signals(self)
         self.__title = builder.get_object('title')
         self.__uri = builder.get_object('uri')
         self.__image = builder.get_object('image')
+        self.__image_close = builder.get_object('image_close')
         self.__title.set_label("Empty page")
         self.add_webview(webview)
         self.add(builder.get_object('widget'))
+        webview.connect("notify::favicon", self.__on_notify_favicon)
 
     def add_webview(self, webview):
         """
@@ -44,8 +49,30 @@ class SidebarChild(Gtk.ListBoxRow):
         if self.__webview is None and webview is not None:
             webview.connect('load-changed', self.__on_load_changed)
             self.__webview = webview
-            self.__image.set_from_icon_name('close-symbolic',
-                                            Gtk.IconSize.MENU)
+
+#######################
+# PROTECTED           #
+#######################
+    def _on_enter_notify(self, eventbox, event):
+        """
+            Show close button
+            @param eventbox as Gtk.EventBox
+            @param event as Gdk.Event
+        """
+        self.__image_close.set_from_icon_name('close-symbolic',
+                                              Gtk.IconSize.DIALOG)
+        self.__image_close.get_style_context().add_class('sidebar-close')
+
+        self.__image_close.show()
+
+    def _on_leave_notify(self, eventbox, event):
+        """
+            Show close button
+            @param eventbox as Gtk.EventBox
+            @param event as Gdk.Event
+        """
+        self.__image_close.hide()
+        self.__on_notify_favicon(self.__webview, None)
 
 #######################
 # PRIVATE             #
@@ -53,6 +80,7 @@ class SidebarChild(Gtk.ListBoxRow):
     def __get_favicon(self, surface):
         """
             Resize surface to match favicon size
+            @param surface as cairo.surface
         """
         pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0,
                                              surface.get_width(),
@@ -64,6 +92,42 @@ class SidebarChild(Gtk.ListBoxRow):
         del scaled
         return s
 
+    def __set_favicon(self):
+        """
+            Set favicon
+        """
+        surface = self.__get_favicon(self.__webview.get_favicon())
+        self.__image_close.set_from_surface(surface)
+        del surface
+        self.__image_close.get_style_context().remove_class('sidebar-close')
+        self.__image_close.show()
+
+    def __set_preview(self):
+        """
+            Set webpage preview
+        """
+        window = self.__webview.get_window()
+        if window is not None:
+            wanted_height = self.__webview.get_allocated_width() *\
+                self.get_allocated_height() / \
+                self.get_allocated_width()
+            pixbuf = Gdk.pixbuf_get_from_window(
+                                        window,
+                                        0, 0,
+                                        self.__webview.get_allocated_width(),
+                                        wanted_height)
+            scaled = pixbuf.scale_simple(self.get_allocated_width() - 6,
+                                         self.get_allocated_height() - 3,
+                                         GdkPixbuf.InterpType.BILINEAR)
+            del pixbuf
+            surface = Gdk.cairo_surface_create_from_pixbuf(
+                                                   scaled,
+                                                   self.get_scale_factor(),
+                                                   None)
+            del scaled
+            self.__image.set_from_surface(surface)
+            del surface
+
     def __on_load_changed(self, view, event):
         """
             Update label
@@ -71,33 +135,32 @@ class SidebarChild(Gtk.ListBoxRow):
             @parma event as WebKit2.LoadEvent
         """
         if event == WebKit2.LoadEvent.STARTED:
-            self.__uri.set_text(view.get_uri())
+            self.__title.set_text(view.get_uri())
             El().navigation.emit('uri-changed', view.get_uri())
+            self.__image_close.hide()
+            self.__image.set_from_icon_name('web-browser-symbolic',
+                                            Gtk.IconSize.LARGE_TOOLBAR)
         elif event == WebKit2.LoadEvent.FINISHED:
-            self.__title.set_text(view.get_title())
-            El().navigation.emit('title-changed', view.get_title())
-            self.__uri.set_text(view.get_uri())
+            title = view.get_title()
+            if title is not None:
+                self.__title.set_text(title)
+            El().navigation.emit('title-changed', title)
             El().navigation.emit('uri-changed', view.get_uri())
-            if view.get_favicon() is None:
-                view.connect("notify::favicon", self.__on_notify_favicon)
-            else:
-                surface = self.__get_favicon(view.get_favicon())
-                self.__image.set_from_surface(surface)
-                del surface
+            GLib.timeout_add(500, self.__set_preview)
+            if view.get_favicon() is not None:
+                GLib.timeout_add(500, self.__set_favicon)
 
     def __on_notify_favicon(self, view, pointer):
         """
             Set favicon
             @param view as WebKit2.WebView
-            @param pointer as GParamPointer
+            @param pointer as GParamPointer => unused
         """
         if view.get_favicon() is None:
-            self.__image.set_from_icon_name('close-symbolic',
-                                            Gtk.IconSize.MENU)
+            self.__image_close.set_from_icon_name('close-symbolic',
+                                                  Gtk.IconSize.MENU)
         else:
-            surface = self.__get_favicon(view.get_favicon())
-            self.__image.set_from_surface(surface)
-            del surface
+            self.__set_favicon()
 
 
 class StackSidebar(Gtk.Grid):
