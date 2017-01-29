@@ -3,13 +3,9 @@
     text-shadow: none;
 }
 
-.sidebar-label {
-    border: 2px solid white;
-    background-color: black;
-    color: white;
-    opacity: 0.8;
-    padding: 2px;
-    border-radius: 5px;
+.sidebarchild-title {
+    background-color: @theme_selected_fg_color;
+    opacity: 0.9;
 }
 
 .sidebar-close {

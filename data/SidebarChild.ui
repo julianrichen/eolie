@@ -8,67 +8,65 @@
     <signal name="enter-notify-event" handler="_on_enter_notify" swapped="no"/>
     <signal name="leave-notify-event" handler="_on_leave_notify" swapped="no"/>
     <child>
-      <object class="GtkGrid" id="grid">
+      <object class="GtkOverlay">
+        <property name="height_request">60</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkLabel" id="title">
+          <object class="GtkImage" id="image">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="valign">end</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-            <property name="ellipsize">end</property>
+            <property name="icon_size">3</property>
           </object>
           <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">1</property>
+            <property name="index">-1</property>
           </packing>
         </child>
-        <child>
-          <object class="GtkOverlay">
-            <property name="height_request">40</property>
+        <child type="overlay">
+          <object class="GtkGrid" id="grid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="valign">end</property>
             <child>
-              <object class="GtkImage" id="image">
+              <object class="GtkLabel" id="title">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="icon_name">web-browser-symbolic</property>
-                <property name="icon_size">3</property>
+                <property name="halign">center</property>
+                <property name="valign">end</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <property name="ellipsize">end</property>
               </object>
               <packing>
-                <property name="index">-1</property>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
               </packing>
             </child>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">0</property>
-            <property name="width">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEventBox" id="button">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="halign">end</property>
-            <property name="valign">center</property>
-            <property name="vexpand">True</property>
             <child>
-              <object class="GtkImage" id="image_close">
-                <property name="width_request">22</property>
-                <property name="height_request">22</property>
+              <object class="GtkEventBox" id="button">
+                <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="pixel_size">12</property>
+                <property name="halign">end</property>
+                <property name="valign">center</property>
+                <property name="vexpand">True</property>
+                <child>
+                  <object class="GtkImage" id="image_close">
+                    <property name="width_request">22</property>
+                    <property name="height_request">22</property>
+                    <property name="can_focus">False</property>
+                    <property name="pixel_size">12</property>
+                  </object>
+                </child>
               </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+              </packing>
             </child>
+            <style>
+              <class name="sidebarchild-title"/>
+            </style>
           </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">1</property>
-          </packing>
         </child>
       </object>
     </child>

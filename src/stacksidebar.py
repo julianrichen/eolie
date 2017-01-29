@@ -20,7 +20,7 @@ class SidebarChild(Gtk.ListBoxRow):
     """
         A Sidebar Child
     """
-    __HEIGHT = 40
+    __HEIGHT = 60
 
     def __init__(self, webview=None):
         """
@@ -84,6 +84,8 @@ class SidebarChild(Gtk.ListBoxRow):
             Resize surface to match favicon size
             @param surface as cairo.surface
         """
+        if surface is None:
+            return None
         pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0,
                                              surface.get_width(),
                                              surface.get_height())
@@ -99,6 +101,8 @@ class SidebarChild(Gtk.ListBoxRow):
             Set favicon
         """
         surface = self.__get_favicon(self.__webview.get_favicon())
+        if surface is None:
+            return
         self.__image_close.set_from_surface(surface)
         del surface
         self.__image_close.get_style_context().remove_class('sidebar-close')
@@ -145,9 +149,6 @@ class SidebarChild(Gtk.ListBoxRow):
         if event == WebKit2.LoadEvent.STARTED:
             self.__title.set_text(view.get_uri())
             El().navigation.emit('uri-changed', view.get_uri())
-            self.__image_close.hide()
-            self.__image.set_from_icon_name('web-browser-symbolic',
-                                            Gtk.IconSize.LARGE_TOOLBAR)
         elif event == WebKit2.LoadEvent.FINISHED:
             title = view.get_title()
             if title is not None:
