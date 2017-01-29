@@ -12,8 +12,10 @@
 
 from gi.repository import Gtk
 
+from eolie.define import El
 
-class ToolbarTitle(Gtk.Overlay):
+
+class ToolbarTitle(Gtk.Bin):
     """
         Title toolbar
     """
@@ -22,7 +24,12 @@ class ToolbarTitle(Gtk.Overlay):
         """
             Init toolbar
         """
-        Gtk.Overlay.__init__(self)
+        Gtk.Bin.__init__(self)
+        builder = Gtk.Builder()
+        builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
+        builder.connect_signals(self)
+        self.add(builder.get_object('widget'))
+        self.set_width(400)
 
     def set_width(self, width):
         """
@@ -31,6 +38,15 @@ class ToolbarTitle(Gtk.Overlay):
         """
         self.set_property("width_request", width)
 
+#######################
+# PROTECTED           #
+#######################
+    def _on_activate(self, entry):
+        """
+            Go to url or search for words
+            @param entry as Gtk.Entry
+        """
+        El().window.container.load_uri(entry.get_text())
 #######################
 # PRIVATE             #
 #######################

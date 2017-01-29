@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.20.0 -->
+<interface domain="lollypop">
+  <requires lib="gtk+" version="3.10"/>
+  <object class="GtkOverlay" id="widget">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkEntry">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="primary_icon_name">changes-prevent-symbolic</property>
+        <signal name="activate" handler="_on_activate" swapped="no"/>
+        <style>
+          <class name="urlbar"/>
+        </style>
+      </object>
+      <packing>
+        <property name="index">-1</property>
+      </packing>
+    </child>
+    <child type="overlay">
+      <object class="GtkEventBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="halign">end</property>
+        <property name="valign">center</property>
+        <property name="margin_right">10</property>
+        <property name="above_child">True</property>
+        <child>
+          <object class="GtkImage">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="icon_name">view-refresh-symbolic</property>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="index">1</property>
+      </packing>
+    </child>
+  </object>
+</interface>

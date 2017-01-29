@@ -37,10 +37,7 @@ class Window(Gtk.ApplicationWindow):
         self.connect('realize', self.__on_realize)
         self.connect('window-state-event', self.__on_window_state_event)
         self.connect('configure-event', self.__on_configure_event)
-        self.__container.add_web_view("https://linuxfr.org")
-        self.__container.add_web_view("https://github.com")
-        self.__container.add_web_view("https://archlinux.org")
-        self.__container.add_web_view("https://imgur.com")
+        self.__container.add_web_view("about:blank")
 
     def setup_window(self):
         """
@@ -49,6 +46,14 @@ class Window(Gtk.ApplicationWindow):
         self.__setup_pos()
         if El().settings.get_value('window-maximized'):
             self.maximize()
+
+    @property
+    def container(self):
+        """
+            Get window container
+            @return Container
+        """
+        return self.__container
 
 ############
 # Private  #

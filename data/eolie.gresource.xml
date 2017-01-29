@@ -9,5 +9,6 @@
     <file compressed="true" preprocess="xml-stripblanks">SidebarChild.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ToolbarActions.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ToolbarEnd.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ToolbarTitle.ui</file>
   </gresource>
 </gresources>

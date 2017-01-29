@@ -49,5 +49,14 @@ class Container(Gtk.Paned):
         view = WebView()
         view.show()
         self.__stack_sidebar.add_child(view)
-        if uri is not None:
+        if uri is not None and uri != "about:blank":
+            view.load_uri(uri)
+
+    def load_uri(self, uri):
+        """
+            Load uri in current view
+            @param uri as str
+        """
+        view = self.__stack.get_visible_child()
+        if view is not None:
             view.load_uri(uri)
