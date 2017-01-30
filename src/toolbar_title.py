@@ -28,6 +28,7 @@ class ToolbarTitle(Gtk.Bin):
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
         builder.connect_signals(self)
+        self.__entry = builder.get_object('entry')
         self.add(builder.get_object('widget'))
         self.set_width(400)
 
@@ -38,6 +39,13 @@ class ToolbarTitle(Gtk.Bin):
         """
         self.set_property("width_request", width)
 
+    def set_uri(self, uri):
+        """
+            Update entry
+            @param text as str
+        """
+        self.__entry.set_text(uri)
+
 #######################
 # PROTECTED           #
 #######################
@@ -46,7 +54,8 @@ class ToolbarTitle(Gtk.Bin):
             Go to url or search for words
             @param entry as Gtk.Entry
         """
-        El().window.container.load_uri(entry.get_text())
+        text = entry.get_text()
+        El().window.container.load_uri(text)
 #######################
 # PRIVATE             #
 #######################

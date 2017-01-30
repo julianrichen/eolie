@@ -40,23 +40,60 @@ class Container(Gtk.Paned):
         self.add1(self.__stack_sidebar)
         self.add2(self.__scrolled)
 
-    def add_web_view(self, uri=None):
+    def add_web_view(self, uri, show):
         """
             Add a web view to container
             @param uri as str
+            @param show as bool
         """
         from eolie.web_view import WebView
+        if uri is None:
+            uri = "about:blank"
         view = WebView()
+        view.connect('load-changed', self.__on_load_changed)
+        if uri != "about:blank":
+            view.load_uri(uri)
+        El().window.toolbar.title.set_uri(uri)
         view.show()
         self.__stack_sidebar.add_child(view)
-        if uri is not None and uri != "about:blank":
-            view.load_uri(uri)
+        if show:
+            self.__stack.add(view)
+            self.__stack.set_visible_child(view)
+        else:
+            window = Gtk.OffscreenWindow.new()
+            scrolled = Gtk.ScrolledWindow()
+            scrolled.set_hexpand(True)
+            scrolled.set_vexpand(True)
+            scrolled.add(view)
+            scrolled.set_size_request(1000, 1000)
+            window.add(scrolled)
+            window.show_all()
 
     def load_uri(self, uri):
         """
             Load uri in current view
             @param uri as str
         """
-        view = self.__stack.get_visible_child()
-        if view is not None:
-            view.load_uri(uri)
+        if self.current is not None:
+            self.current.load_uri(uri)
+
+    @property
+    def current(self):
+        """
+            Current view
+            @return WebView
+        """
+        return self.__stack.get_visible_child()
+
+#######################
+# PRIVATE             #
+#######################
+    def __on_load_changed(self, view, event):
+        """
+            Update sidebar/urlbar
+            @param view as WebView
+            @param event as WebKit2.LoadEvent
+        """
+        self.__stack_sidebar.on_load_changed(view, event)
+        if view == self.current and view.get_uri() is not None:
+            El().window.toolbar.title.set_uri(view.get_uri())

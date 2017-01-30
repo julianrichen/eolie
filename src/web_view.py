@@ -44,3 +44,16 @@ class WebView(WebKit2.WebView):
         settings.set_property("media-playback-allows-inline", True)
         self.set_settings(settings)
         self.show()
+
+    def load_uri(self, uri):
+        """
+            Load uri
+            @param uri as str
+        """
+        if not uri.startswith("http://") or not uri.startswith("https://"):
+            uri = "http://" + uri
+        WebKit2.WebView.load_uri(self, uri)
+
+#######################
+# PRIVATE             #
+#######################

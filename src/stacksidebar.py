@@ -22,13 +22,13 @@ class SidebarChild(Gtk.ListBoxRow):
     """
     __HEIGHT = 60
 
-    def __init__(self, webview=None):
+    def __init__(self, view):
         """
             Init child
-            @param web as WebView
+            @param view as WebView
         """
         Gtk.ListBoxRow.__init__(self)
-        self.__webview = None
+        self.__view = view
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/SidebarChild.ui')
         builder.connect_signals(self)
@@ -36,21 +36,41 @@ class SidebarChild(Gtk.ListBoxRow):
         self.__uri = builder.get_object('uri')
         self.__image = builder.get_object('image')
         self.__image_close = builder.get_object('image_close')
+        self.__image_close.set_from_icon_name('web-browser-symbolic',
+                                              Gtk.IconSize.DIALOG)
         self.__title.set_label("Empty page")
-        self.add_webview(webview)
         self.add(builder.get_object('widget'))
-        webview.connect("notify::favicon", self.__on_notify_favicon)
+        view.connect("notify::favicon", self.__on_notify_favicon)
         self.get_style_context().add_class('sidebar-item')
 
-    def add_webview(self, webview):
+    @property
+    def view(self):
         """
-            Add a webview
-            Do nothing if already exists
-            @param webview as WebView
+            Get linked view
+            @return WebView
         """
-        if self.__webview is None and webview is not None:
-            webview.connect('load-changed', self.__on_load_changed)
-            self.__webview = webview
+        return self.__view
+
+    def on_load_changed(self, view, event):
+        """
+            Update label/favicon
+            @param view as WebView
+            @parma event as WebKit2.LoadEvent
+        """
+        if event == WebKit2.LoadEvent.STARTED:
+            self.__title.set_text(view.get_uri())
+            El().navigation.emit('uri-changed', view.get_uri())
+            self.__image_close.set_from_icon_name('web-browser-symbolic',
+                                                  Gtk.IconSize.DIALOG)
+        elif event == WebKit2.LoadEvent.FINISHED:
+            title = view.get_title()
+            if title is not None:
+                self.__title.set_text(title)
+            El().navigation.emit('title-changed', title)
+            El().navigation.emit('uri-changed', view.get_uri())
+            GLib.timeout_add(500, self.__set_preview)
+            if view.get_favicon() is not None:
+                GLib.timeout_add(500, self.__set_favicon)
 
 #######################
 # PROTECTED           #
@@ -65,16 +85,14 @@ class SidebarChild(Gtk.ListBoxRow):
                                               Gtk.IconSize.DIALOG)
         self.__image_close.get_style_context().add_class('sidebar-close')
 
-        self.__image_close.show()
-
     def _on_leave_notify(self, eventbox, event):
         """
             Show close button
             @param eventbox as Gtk.EventBox
             @param event as Gdk.Event
         """
-        self.__image_close.hide()
-        self.__on_notify_favicon(self.__webview, None)
+        self.__image_close.get_style_context().remove_class('sidebar-close')
+        self.__on_notify_favicon(self.__view, None)
 
 #######################
 # PRIVATE             #
@@ -100,8 +118,10 @@ class SidebarChild(Gtk.ListBoxRow):
         """
             Set favicon
         """
-        surface = self.__get_favicon(self.__webview.get_favicon())
+        surface = self.__get_favicon(self.__view.get_favicon())
         if surface is None:
+            self.__image_close.set_from_icon_name('web-browser-symbolic',
+                                                  Gtk.IconSize.DIALOG)
             return
         self.__image_close.set_from_surface(surface)
         del surface
@@ -112,7 +132,7 @@ class SidebarChild(Gtk.ListBoxRow):
         """
             Set webpage preview
         """
-        self.__webview.get_snapshot(
+        self.__view.get_snapshot(
                                 WebKit2.SnapshotRegion.FULL_DOCUMENT,
                                 WebKit2.SnapshotOptions.NONE,
                                 None,
@@ -125,7 +145,7 @@ class SidebarChild(Gtk.ListBoxRow):
             @param result as Gio.AsyncResult
         """
         try:
-            snapshot = self.__webview.get_snapshot_finish(result)
+            snapshot = self.__view.get_snapshot_finish(result)
         except:
             return
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
@@ -136,28 +156,9 @@ class SidebarChild(Gtk.ListBoxRow):
         factor = self.get_allocated_width() /\
             snapshot.get_width()
         context.scale(factor, factor)
-        self.__webview.draw(context)
+        self.__view.draw(context)
         self.__image.set_from_surface(surface)
         del surface
-
-    def __on_load_changed(self, view, event):
-        """
-            Update label
-            @param view as WebView
-            @parma event as WebKit2.LoadEvent
-        """
-        if event == WebKit2.LoadEvent.STARTED:
-            self.__title.set_text(view.get_uri())
-            El().navigation.emit('uri-changed', view.get_uri())
-        elif event == WebKit2.LoadEvent.FINISHED:
-            title = view.get_title()
-            if title is not None:
-                self.__title.set_text(title)
-            El().navigation.emit('title-changed', title)
-            El().navigation.emit('uri-changed', view.get_uri())
-            GLib.timeout_add(500, self.__set_preview)
-            if view.get_favicon() is not None:
-                GLib.timeout_add(500, self.__set_favicon)
 
     def __on_notify_favicon(self, view, pointer):
         """
@@ -166,8 +167,8 @@ class SidebarChild(Gtk.ListBoxRow):
             @param pointer as GParamPointer => unused
         """
         if view.get_favicon() is None:
-            self.__image_close.set_from_icon_name('close-symbolic',
-                                                  Gtk.IconSize.MENU)
+            self.__image_close.set_from_icon_name('web-browser-symbolic',
+                                                  Gtk.IconSize.DIALOG)
         else:
             self.__set_favicon()
 
@@ -182,7 +183,6 @@ class StackSidebar(Gtk.Grid):
             @param stack as Gtk.Stack
         """
         Gtk.Grid.__init__(self)
-        self.__children = []
         self.__stack = stack
         self.set_orientation(Gtk.Orientation.VERTICAL)
         self.__scrolled = Gtk.ScrolledWindow()
@@ -195,26 +195,25 @@ class StackSidebar(Gtk.Grid):
         self.__scrolled.add(self.__listbox)
         self.add(self.__scrolled)
 
-    def add_child(self, widget):
+    def add_child(self, view):
         """
             Add child to sidebar
-            @param widget as Gtk.Widget
+            @param view as WebView
         """
-        self.__children.append(widget)
-        child = SidebarChild(widget)
+        child = SidebarChild(view)
         child.show()
         self.__listbox.add(child)
-        if self.__stack.get_visible_child() is None:
-            self.__stack.add(widget)
-        else:
-            window = Gtk.OffscreenWindow.new()
-            scrolled = Gtk.ScrolledWindow()
-            scrolled.set_hexpand(True)
-            scrolled.set_vexpand(True)
-            scrolled.add(widget)
-            scrolled.set_size_request(1000, 1000)
-            window.add(scrolled)
-            window.show_all()
+
+    def on_load_changed(self, view, event):
+        """
+            Update child linked to view
+            @param view as WebView
+            @parma event as WebKit2.LoadEvent
+        """
+        for child in self.__listbox.get_children():
+            if child.view == view:
+                child.on_load_changed(view, event)
+
 #######################
 # PRIVATE             #
 #######################

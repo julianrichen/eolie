@@ -12,6 +12,8 @@
 
 from gi.repository import Gtk
 
+from eolie.define import El
+
 
 class ToolbarActions(Gtk.Bin):
     """
@@ -25,7 +27,7 @@ class ToolbarActions(Gtk.Bin):
         Gtk.Bin.__init__(self)
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarActions.ui')
-        # builder.connect_signals(self)
+        builder.connect_signals(self)
 
         self.add(builder.get_object('actions'))
 
@@ -34,5 +36,25 @@ class ToolbarActions(Gtk.Bin):
         self._next_btn = builder.get_object('next_button')
 
 #######################
-# PRIVATE             #
+# PROTECTED           #
 #######################
+    def _on_prev_button_clicked(self, button):
+        """
+            aa
+            @param button as Gtk.Button
+        """
+        pass
+
+    def _on_next_button_clicked(self, button):
+        """
+            aa
+            @param button as Gtk.Button
+        """
+        pass
+
+    def _on_new_button_clicked(self, button):
+        """
+            Add a new web view
+            @param button as Gtk.Button
+        """
+        El().window.new_web_view(True)

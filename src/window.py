@@ -37,7 +37,6 @@ class Window(Gtk.ApplicationWindow):
         self.connect('realize', self.__on_realize)
         self.connect('window-state-event', self.__on_window_state_event)
         self.connect('configure-event', self.__on_configure_event)
-        self.__container.add_web_view("https://www.youtube.com")
 
     def setup_window(self):
         """
@@ -47,6 +46,12 @@ class Window(Gtk.ApplicationWindow):
         if El().settings.get_value('window-maximized'):
             self.maximize()
 
+    def new_web_view(self, show):
+        """
+            Add a new web view, show it
+        """
+        self.__container.add_web_view("about:blank", True)
+
     @property
     def container(self):
         """
@@ -54,6 +59,14 @@ class Window(Gtk.ApplicationWindow):
             @return Container
         """
         return self.__container
+
+    @property
+    def toolbar(self):
+        """
+            Get window toolbar
+            @return Toolbar
+        """
+        return self.__toolbar
 
 ############
 # Private  #

@@ -114,6 +114,7 @@ class Application(Gtk.Application):
                 self.window = Window()
                 self.window.setup_menu(menu)
             self.window.show()
+            self.window.new_web_view(True)
 
     def prepare_to_exit(self, action=None, param=None, exit=True):
         """

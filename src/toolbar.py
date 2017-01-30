@@ -38,6 +38,14 @@ class Toolbar(Gtk.HeaderBar):
         self.set_custom_title(self.__toolbar_title)
         self.pack_end(self.__toolbar_end)
 
+    @property
+    def title(self):
+        """
+            Toolbar title
+            @return ToolbarTitle
+        """
+        return self.__toolbar_title
+
 #######################
 # PRIVATE             #
 #######################
