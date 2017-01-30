@@ -12,6 +12,8 @@
 
 from gi.repository import WebKit2
 
+from eolie.define import El
+
 
 class WebView(WebKit2.WebView):
     """
@@ -43,6 +45,7 @@ class WebView(WebKit2.WebView):
                               True)
         settings.set_property("media-playback-allows-inline", True)
         self.set_settings(settings)
+        self.connect('map', self.__on_map)
         self.show()
 
     def load_uri(self, uri):
@@ -57,3 +60,10 @@ class WebView(WebKit2.WebView):
 #######################
 # PRIVATE             #
 #######################
+    def __on_map(self, uri):
+        """
+            Update window
+        """
+        El().window.toolbar.title.set_uri(self.get_uri())
+        if not self.is_loading():
+            El().window.toolbar.title.set_title(self.get_title())

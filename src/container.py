@@ -36,8 +36,15 @@ class Container(Gtk.Paned):
         self.__stack.show()
         self.__stack_sidebar = StackSidebar(self.__stack)
         self.__stack_sidebar.show()
+        progress = Gtk.ProgressBar()
+        progress.set_property('valign', Gtk.Align.END)
+        progress.show()
+        overlay = Gtk.Overlay.new()
+        overlay.add(self.__stack)
+        overlay.add_overlay(progress)
+        overlay.show()
         self.add1(self.__stack_sidebar)
-        self.add2(self.__stack)
+        self.add2(overlay)
 
     def add_web_view(self, uri, show):
         """
