@@ -29,6 +29,7 @@ class ToolbarTitle(Gtk.Bin):
         builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
         builder.connect_signals(self)
         self.__entry = builder.get_object('entry')
+        self.__reload_image = builder.get_object('reload_image')
         self.add(builder.get_object('widget'))
         self.set_width(400)
 
@@ -49,6 +50,32 @@ class ToolbarTitle(Gtk.Bin):
 #######################
 # PROTECTED           #
 #######################
+    def _on_reload_press(self, eventbox, event):
+        """
+            Reload current view
+            @param eventbox as Gtk.EventBox
+            @param event as Gdk.Event
+        """
+        El().window.container.current.reload()
+
+    def _on_reload_enter_notify(self, eventbox, event):
+        """
+            Change opacity
+            @param eventbox as Gtk.EventBox
+            @param event as Gdk.Event
+            @param image as Gtk.Image
+        """
+        self.__reload_image.set_opacity(1)
+
+    def _on_reload_leave_notify(self, eventbox, event):
+        """
+            Change opacity
+            @param eventbox as Gtk.EventBox
+            @param event as Gdk.Event
+            @param image as Gtk.Image
+        """
+        self.__reload_image.set_opacity(0.8)
+
     def _on_activate(self, entry):
         """
             Go to url or search for words

@@ -50,7 +50,7 @@ class Window(Gtk.ApplicationWindow):
         """
             Add a new web view, show it
         """
-        self.__container.add_web_view("about:blank", True)
+        self.__container.add_web_view("google.fr", show)
 
     @property
     def container(self):

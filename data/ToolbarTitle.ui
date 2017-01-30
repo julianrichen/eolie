@@ -24,14 +24,43 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="halign">end</property>
-        <property name="valign">center</property>
-        <property name="margin_right">10</property>
+        <property name="margin_right">5</property>
+        <property name="vexpand">True</property>
         <property name="above_child">True</property>
+        <signal name="button-press-event" handler="_on_reload_press" swapped="no"/>
+        <signal name="enter-notify-event" handler="_on_reload_enter_notify" object="reload_image" swapped="no"/>
+        <signal name="leave-notify-event" handler="_on_reload_leave_notify" object="reload_image" swapped="no"/>
         <child>
-          <object class="GtkImage">
+          <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="icon_name">view-refresh-symbolic</property>
+            <property name="vexpand">True</property>
+            <property name="column_spacing">5</property>
+            <child>
+              <object class="GtkImage" id="reload_image">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="opacity">0.80000000000000004</property>
+                <property name="vexpand">True</property>
+                <property name="icon_name">view-refresh-symbolic</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="vexpand">True</property>
+                <property name="orientation">vertical</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
           </object>
         </child>
       </object>

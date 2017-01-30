@@ -8,6 +8,10 @@
     opacity: 0.9;
 }
 
+.sidebarchild-image {
+    background-color: @theme_selected_fg_color;
+}
+
 .sidebar-close {
     background-color: black;
     color: white;
@@ -21,6 +25,12 @@
     border-radius: 2px;
 }
 
+.sidebar-item-selected{
+    border-color: @theme_selected_bg_color;
+    background-color: @theme_selected_bg_color;
+}
+
 .urlbar {
     padding-right: 30px;
 }
+

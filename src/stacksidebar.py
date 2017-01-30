@@ -192,6 +192,7 @@ class StackSidebar(Gtk.Grid):
         self.__listbox.set_activate_on_single_click(True)
         self.__listbox.set_selection_mode(Gtk.SelectionMode.NONE)
         self.__listbox.show()
+        self.__listbox.connect('row_activated', self.__on_row_activated)
         self.__scrolled.add(self.__listbox)
         self.add(self.__scrolled)
 
@@ -204,6 +205,18 @@ class StackSidebar(Gtk.Grid):
         child.show()
         self.__listbox.add(child)
 
+    def update_visible_child(self):
+        """
+            Mark current child as visible
+            Unmark all others
+        """
+        visible = self.__stack.get_visible_child()
+        for child in self.__listbox.get_children():
+            if child.view == visible:
+                child.get_style_context().add_class('sidebar-item-selected')
+            else:
+                child.get_style_context().remove_class('sidebar-item-selected')
+
     def on_load_changed(self, view, event):
         """
             Update child linked to view
@@ -213,7 +226,16 @@ class StackSidebar(Gtk.Grid):
         for child in self.__listbox.get_children():
             if child.view == view:
                 child.on_load_changed(view, event)
+                break
 
 #######################
 # PRIVATE             #
 #######################
+    def __on_row_activated(self, listbox, row):
+        """
+            Show wanted web view
+            @param listbox as Gtk.ListBox
+            @param row as SidebarChild
+        """
+        self.__stack.set_visible_child(row.view)
+        self.update_visible_child()

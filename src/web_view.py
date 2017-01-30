@@ -50,10 +50,9 @@ class WebView(WebKit2.WebView):
             Load uri
             @param uri as str
         """
-        if not uri.startswith("http://") or not uri.startswith("https://"):
+        if not uri.startswith("http://") and not uri.startswith("https://"):
             uri = "http://" + uri
         WebKit2.WebView.load_uri(self, uri)
-
 #######################
 # PRIVATE             #
 #######################

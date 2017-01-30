@@ -28,17 +28,16 @@ class Container(Gtk.Paned):
         Gtk.Paned.__init__(self)
         self.set_position(
             El().settings.get_value('paned-width').get_int32())
-        self.__scrolled = Gtk.ScrolledWindow()
-        self.__scrolled.set_hexpand(True)
-        self.__scrolled.set_vexpand(True)
-        self.__scrolled.show()
         self.__stack = Gtk.Stack()
+        self.__stack.set_hexpand(True)
+        self.__stack.set_vexpand(True)
+        self.__stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
+        self.__stack.set_transition_duration(150)
         self.__stack.show()
-        self.__scrolled.add(self.__stack)
         self.__stack_sidebar = StackSidebar(self.__stack)
         self.__stack_sidebar.show()
         self.add1(self.__stack_sidebar)
-        self.add2(self.__scrolled)
+        self.add2(self.__stack)
 
     def add_web_view(self, uri, show):
         """
@@ -53,13 +52,15 @@ class Container(Gtk.Paned):
         view.connect('load-changed', self.__on_load_changed)
         if uri != "about:blank":
             view.load_uri(uri)
-        El().window.toolbar.title.set_uri(uri)
         view.show()
         self.__stack_sidebar.add_child(view)
         if show:
             self.__stack.add(view)
             self.__stack.set_visible_child(view)
+            El().window.toolbar.title.set_uri(uri)
+            self.__stack_sidebar.update_visible_child()
         else:
+            print("#FIXME")
             window = Gtk.OffscreenWindow.new()
             scrolled = Gtk.ScrolledWindow()
             scrolled.set_hexpand(True)
