@@ -23,4 +23,24 @@ class WebView(WebKit2.WebView):
             Init view
         """
         WebKit2.WebView.__init__(self)
+        settings = self.get_settings()
+        settings.set_property("allow-file-access-from-file-urls",
+                              False)
+        settings.set_property("auto-load-images", True)
+        settings.set_property("enable-java", True)
+        settings.set_property("enable-javascript", True)
+        settings.set_property("enable-media-stream", True)
+        settings.set_property("enable-mediasource", True)
+        settings.set_property("enable-offline-web-application-cache", True)
+        settings.set_property("enable-page-cache", True)
+        settings.set_property("enable-plugins", True)
+        settings.set_property("enable-resizable-text-areas", True)
+        settings.set_property("enable-smooth-scrolling", True)
+        settings.set_property("enable-webaudio", True)
+        settings.set_property("enable-webgl", True)
+        settings.set_property("javascript-can-access-clipboard", True)
+        settings.set_property("javascript-can-open-windows-automatically",
+                              True)
+        settings.set_property("media-playback-allows-inline", True)
+        self.set_settings(settings)
         self.show()

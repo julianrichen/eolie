@@ -37,7 +37,7 @@ class Window(Gtk.ApplicationWindow):
         self.connect('realize', self.__on_realize)
         self.connect('window-state-event', self.__on_window_state_event)
         self.connect('configure-event', self.__on_configure_event)
-        self.__container.add_web_view("about:blank")
+        self.__container.add_web_view("https://www.youtube.com")
 
     def setup_window(self):
         """
