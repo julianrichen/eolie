@@ -52,6 +52,7 @@
                 <property name="halign">end</property>
                 <property name="valign">center</property>
                 <property name="vexpand">True</property>
+                <signal name="button-press-event" handler="_on_button_press" swapped="no"/>
                 <child>
                   <object class="GtkImage" id="image_close">
                     <property name="width_request">22</property>

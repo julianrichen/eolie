@@ -75,6 +75,12 @@ class SidebarChild(Gtk.ListBoxRow):
 #######################
 # PROTECTED           #
 #######################
+    def _on_button_press(self, button, event):
+        """
+            Destroy self
+        """
+        self.destroy()
+
     def _on_enter_notify(self, eventbox, event):
         """
             Show close button
@@ -202,6 +208,7 @@ class StackSidebar(Gtk.Grid):
             @param view as WebView
         """
         child = SidebarChild(view)
+        child.connect('destroy', self.__on_child_destroy)
         child.show()
         self.__listbox.add(child)
 
@@ -231,6 +238,11 @@ class StackSidebar(Gtk.Grid):
 #######################
 # PRIVATE             #
 #######################
+    def __on_child_destroy(self, child):
+        if len(self.__listbox.get_children()) == 0:
+            El().window.new_web_view(True)
+        child.view.destroy()
+
     def __on_row_activated(self, listbox, row):
         """
             Show wanted web view
