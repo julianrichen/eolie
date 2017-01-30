@@ -60,6 +60,7 @@ class SidebarChild(Gtk.ListBoxRow):
         if event == WebKit2.LoadEvent.STARTED:
             self.__title.set_text(view.get_uri())
             El().navigation.emit('uri-changed', view.get_uri())
+            self.__image.clear()
             self.__image_close.set_from_icon_name('web-browser-symbolic',
                                                   Gtk.IconSize.DIALOG)
         elif event == WebKit2.LoadEvent.FINISHED:

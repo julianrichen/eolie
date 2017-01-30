@@ -27,7 +27,7 @@ class WebView(WebKit2.WebView):
         settings.set_property("allow-file-access-from-file-urls",
                               False)
         settings.set_property("auto-load-images", True)
-        settings.set_property("enable-java", True)
+        settings.set_property("enable-java", False)
         settings.set_property("enable-javascript", True)
         settings.set_property("enable-media-stream", True)
         settings.set_property("enable-mediasource", True)
@@ -53,6 +53,7 @@ class WebView(WebKit2.WebView):
         if not uri.startswith("http://") and not uri.startswith("https://"):
             uri = "http://" + uri
         WebKit2.WebView.load_uri(self, uri)
+
 #######################
 # PRIVATE             #
 #######################

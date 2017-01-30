@@ -86,6 +86,8 @@ class Application(Gtk.Application):
         context = WebKit2.WebContext.get_default()
         data_manager = WebKit2.WebsiteDataManager()
         context.new_with_website_data_manager(data_manager)
+        context.set_process_model(
+                            WebKit2.ProcessModel.MULTIPLE_SECONDARY_PROCESSES)
         context.set_cache_model(WebKit2.CacheModel.WEB_BROWSER)
         d = Gio.File.new_for_path(self.__FAVICONS_PATH)
         if not d.query_exists():
