@@ -25,6 +25,18 @@ treeview .image:selected{
     color: @theme_selected_fg_color;
 }
 
+.progressbar progress {
+    background-color: @theme_selected_bg_color;
+    background-image: none;
+    border: none;
+}
+
+.progressbar trough {
+    border: none;
+    background-color: transparent;
+    background-image: none;
+}
+
 .sidebarchild-title {
     background-color: @theme_selected_fg_color;
     opacity: 0.97;

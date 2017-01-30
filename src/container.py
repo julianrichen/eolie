@@ -36,12 +36,12 @@ class Container(Gtk.Paned):
         self.__stack.show()
         self.__stack_sidebar = StackSidebar(self.__stack)
         self.__stack_sidebar.show()
-        progress = Gtk.ProgressBar()
-        progress.set_property('valign', Gtk.Align.END)
-        progress.show()
+        self.__progress = Gtk.ProgressBar()
+        self.__progress.get_style_context().add_class('progressbar')
+        self.__progress.set_property('valign', Gtk.Align.START)
         overlay = Gtk.Overlay.new()
         overlay.add(self.__stack)
-        overlay.add_overlay(progress)
+        overlay.add_overlay(self.__progress)
         overlay.show()
         self.add1(self.__stack_sidebar)
         self.add2(overlay)
@@ -56,6 +56,9 @@ class Container(Gtk.Paned):
         if uri is None:
             uri = "about:blank"
         view = WebView()
+        view.connect('map', self.__on_view_map)
+        view.connect('notify::estimated-load-progress',
+                     self.__on_estimated_load_progress)
         view.connect('button-press-event', self.__on_button_press)
         view.connect('load-changed', self.__on_load_changed)
         if uri != "about:blank":
@@ -97,6 +100,18 @@ class Container(Gtk.Paned):
 #######################
 # PRIVATE             #
 #######################
+    def __on_view_map(self, view):
+        """
+            Update window
+            @param view as WebView
+        """
+        El().window.toolbar.title.set_uri(view.get_uri())
+        if view.is_loading():
+            self.__progress.show()
+        else:
+            self.__progress.hide()
+            El().window.toolbar.title.set_title(view.get_title())
+
     def __on_button_press(self, widget, event):
         """
             Hide Titlebar popover
@@ -104,6 +119,15 @@ class Container(Gtk.Paned):
             @param event as Gdk.Event
         """
         El().window.toolbar.title.hide_popover()
+
+    def __on_estimated_load_progress(self, view, value):
+        """
+            Update progress bar
+            @param view as WebView
+            @param UNUSED
+        """
+        value = view.get_estimated_load_progress()
+        self.__progress.set_fraction(value)
 
     def __on_load_changed(self, view, event):
         """
@@ -114,7 +138,10 @@ class Container(Gtk.Paned):
         self.__stack_sidebar.on_load_changed(view, event)
         if view == self.current:
             El().window.toolbar.title.set_uri(view.get_uri())
+        if event == WebKit2.LoadEvent.STARTED:
+            self.__progress.show()
         if event == WebKit2.LoadEvent.FINISHED:
+            self.__progress.hide()
             El().history.add(view.get_title(), view.get_uri())
             if view == self.current:
                 El().window.toolbar.actions.set_actions(view)
