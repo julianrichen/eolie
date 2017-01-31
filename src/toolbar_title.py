@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GLib
 
 from eolie.define import El
 from eolie.popover_uri import UriPopover
@@ -144,6 +144,8 @@ class ToolbarTitle(Gtk.Bin):
         elif event.keyval == Gdk.KEY_Return and entry.get_text() == self.__uri:
             self.__popover.send_event_to_history(event)
             return True
+        elif event.keyval == Gdk.KEY_Return:
+            GLib.idle_add(self.hide_popover)
 
     def _on_reload_press(self, eventbox, event):
         """
