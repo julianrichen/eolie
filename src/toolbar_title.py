@@ -28,6 +28,7 @@ class ToolbarTitle(Gtk.Bin):
         Gtk.Bin.__init__(self)
         self.__uri = ""
         self.__lock = False
+        self.__in_notify = False
         self.__signal_id = None
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
@@ -61,7 +62,7 @@ class ToolbarTitle(Gtk.Bin):
         """
         if title is not None:
             self.__entry.set_placeholder_text(title)
-            if not self.__lock:
+            if not self.__lock and not self.__in_notify:
                 self.__entry.set_text("")
                 self.__entry.get_style_context().add_class('uribar-title')
 
@@ -82,6 +83,7 @@ class ToolbarTitle(Gtk.Bin):
             @param eventbox as Gtk.EventBox
             @param event as Gdk.Event
         """
+        self.__in_notify = True
         current_text = self.__entry.get_text()
         if current_text == "":
             self.__entry.set_text(self.__uri)
@@ -98,6 +100,7 @@ class ToolbarTitle(Gtk.Bin):
            event.x >= allocation.width or\
            event.y <= 0 or\
            event.y >= allocation.height:
+            self.__in_notify = False
             if self.__entry.get_placeholder_text() and\
                     self.__entry.get_text() and\
                     not self.__lock:
