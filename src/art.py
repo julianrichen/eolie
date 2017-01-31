@@ -18,6 +18,8 @@
 
 from gi.repository import Gdk, GdkPixbuf, Gio, GLib
 
+from urllib.parse import urlparse
+
 
 class Art:
     """
@@ -41,7 +43,7 @@ class Art:
             @param surface as cairo.surface
             @param suffix as str
         """
-        escaped = GLib.uri_escape_string(uri, None, False)
+        escaped = GLib.uri_escape_string(self.__strip_uri(uri), None, False)
         filepath = "%s/%s_%s.png" % (self.__CACHE_PATH, escaped, suffix)
         pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0,
                                              surface.get_width(),
@@ -58,7 +60,7 @@ class Art:
             @param height as int
             @return cairo.surface
         """
-        escaped = GLib.uri_escape_string(uri, None, False)
+        escaped = GLib.uri_escape_string(self.__strip_uri(uri), None, False)
         filepath = "%s/%s_%s.png" % (self.__CACHE_PATH, escaped, suffix)
         f = Gio.File.new_for_path(filepath)
         if f.query_exists():
@@ -79,6 +81,16 @@ class Art:
 #######################
 # PRIVATE             #
 #######################
+    def __strip_uri(self, uri):
+        """
+            Remove prefix from uri
+            @param uri as str
+            @return uri as str
+        """
+        parsed = urlparse(uri)
+        scheme = "%s://" % parsed.scheme
+        return parsed.geturl().replace(scheme, '', 1)
+
     def __create_cache(self):
         """
             Create cache dir

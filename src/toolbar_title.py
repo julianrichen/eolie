@@ -107,7 +107,6 @@ class ToolbarTitle(Gtk.Bin):
         self.__entry.get_style_context().remove_class('uribar-title')
         self.__popover.set_relative_to(self)
         self.__popover.show()
-        self.__popover.set_history_text("")
         self.__signal_id = self.__entry.connect('changed',
                                                 self.__on_entry_changed)
 
@@ -124,7 +123,6 @@ class ToolbarTitle(Gtk.Bin):
         if self.__entry.get_placeholder_text():
             self.__entry.set_text("")
             self.__entry.get_style_context().add_class('uribar-title')
-            self.__popover.hide()
 
     def _on_key_press_event(self, entry, event):
         """

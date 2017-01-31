@@ -15,7 +15,10 @@ from gi.repository import GLib, Gio
 import sqlite3
 
 from eolie.utils import noaccents
+from eolie.localized import LocalizedCollation
 from eolie.sqlcursor import SqlCursor
+from eolie.database_history import DatabaseHistory
+from eolie.define import El
 
 
 class DatabaseBookmarks:
@@ -36,10 +39,14 @@ class DatabaseBookmarks:
     __create_bookmarks = '''CREATE TABLE bookmarks (
                                                id INTEGER PRIMARY KEY,
                                                title TEXT NOT NULL,
-                                               uri TEXT NOT NULL,
-                                               tags TEXT NOT NULL,
-                                               popularity INT NOT NULL
+                                               uri TEXT NOT NULL
                                                )'''
+    __create_tags = '''CREATE TABLE tags (id INTEGER PRIMARY KEY,
+                                          title TEXT NOT NULL)'''
+    __create_bookmarks_tags = '''CREATE TABLE bookmarks_tags (
+                                                    id INTEGER PRIMARY KEY,
+                                                    bookmark_id INT NOT NULL,
+                                                    tag_id INT NOT NULL)'''
 
     def __init__(self):
         """
@@ -54,6 +61,8 @@ class DatabaseBookmarks:
                 # Create db schema
                 with SqlCursor(self) as sql:
                     sql.execute(self.__create_bookmarks)
+                    sql.execute(self.__create_tags)
+                    sql.execute(self.__create_bookmarks_tags)
                     sql.commit()
             except Exception as e:
                 print("DatabaseBookmarks::__init__(): %s" % e)
@@ -63,15 +72,31 @@ class DatabaseBookmarks:
             Add a new bookmark
             @param title as str
             @param uri as str
+            @param tags as [str]
         """
         if not uri or not title:
             return
         with SqlCursor(self) as sql:
-            sql.execute("INSERT INTO bookmarks\
-                              (title, uri, tags, popularity)\
-                              VALUES (?, ?, ?, ?)",
-                        (title, uri, tags, 0))
+            result = sql.execute("INSERT INTO bookmarks\
+                                  (title, uri)\
+                                  VALUES (?, ?)",
+                                 (title, uri))
+            bookmarks_id = result.lastrowid
+            for tag in tags:
+                if not tag:
+                    continue
+                tag_id = self.get_tag_id(tag)
+                if tag_id is None:
+                    result = sql.execute("INSERT INTO tags\
+                                          (title) VALUES (?)",
+                                         (tag,))
+                    tag_id = result.lastrowid
+                sql.execute("INSERT INTO bookmarks_tags\
+                             (bookmark_id, tag_id) VALUES (?, ?)",
+                            (bookmarks_id, tag_id))
             sql.commit()
+            # We need this as current db is attached to history
+            El().history.add(title, uri)
 
     def get_id(self, uri):
         """
@@ -87,15 +112,48 @@ class DatabaseBookmarks:
                 return v[0]
             return None
 
-    def get(self):
+    def get_tag_id(self, title):
         """
-            Get all bookmarks
-            @return [(title, uri, tags)]
+            Get tag id
+            @param title as str
         """
         with SqlCursor(self) as sql:
-            result = sql.execute("SELECT title, uri, tags\
-                                  FROM bookmarks\
-                                  ORDER BY popularity DESC, mtime DESC")
+            result = sql.execute("SELECT rowid\
+                                  FROM tags\
+                                  WHERE title=?", (title,))
+            v = result.fetchone()
+            if v is not None:
+                return v[0]
+            return None
+
+    def get_tags(self):
+        """
+            Get all tags
+            @return [rowid, str]
+        """
+        with SqlCursor(self) as sql:
+            result = sql.execute("SELECT rowid, title\
+                                  FROM tags\
+                                  ORDER BY title COLLATE LOCALIZED")
+            return list(result)
+
+    def get_bookmarks(self, tag_id):
+        """
+            Get all bookmarks
+            @param tag id as int
+            @return [(id, title, uri)]
+        """
+        with SqlCursor(self) as sql:
+            result = sql.execute("\
+                            SELECT bookmarks.rowid,\
+                                   bookmarks.title,\
+                                   bookmarks.uri\
+                            FROM bookmarks, bookmarks_tags, history.history\
+                            WHERE bookmarks.rowid=bookmarks_tags.bookmark_id\
+                            AND bookmarks_tags.tag_id=?\
+                            AND history.uri=bookmarks.uri\
+                            ORDER BY history.popularity DESC",
+                                 (tag_id,))
             return list(result)
 
     def import_firefox(self):
@@ -120,17 +178,17 @@ class DatabaseBookmarks:
             c = sqlite3.connect(sqlite_path, 600.0)
             result = c.execute("SELECT bookmarks.title,\
                                        moz_places.url,\
-                                       tags.title\
+                                       tag.title\
                                 FROM moz_bookmarks AS bookmarks,\
-                                     moz_bookmarks AS tags,\
+                                     moz_bookmarks AS tag,\
                                      moz_places\
                                 WHERE bookmarks.fk=moz_places.id\
                                 AND bookmarks.type=1\
-                                AND tags.id=bookmarks.parent")
-            for (title, uri,  tags) in list(result):
+                                AND tag.id=bookmarks.parent")
+            for (title, uri,  tag) in list(result):
                 rowid = self.get_id(uri)
                 if rowid is None:
-                    self.add(title, uri, tags)
+                    self.add(title, uri, [tag])
 
     def search(self, search):
         """
@@ -153,6 +211,9 @@ class DatabaseBookmarks:
         """
         try:
             c = sqlite3.connect(self.DB_PATH, 600.0)
+            c.create_collation('LOCALIZED', LocalizedCollation())
+            c.execute("ATTACH DATABASE '%s' AS history" %
+                      DatabaseHistory.DB_PATH)
             c.create_function("noaccents", 1, noaccents)
             return c
         except:

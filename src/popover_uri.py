@@ -15,7 +15,7 @@ from gi.repository import Gtk, Gdk, GObject, Gio, Pango
 from eolie.define import El, ArtSize
 
 
-class HistoryItem(GObject.GObject):
+class Item(GObject.GObject):
     title = GObject.Property(type=str,
                              default='')
     uri = GObject.Property(type=str,
@@ -25,14 +25,14 @@ class HistoryItem(GObject.GObject):
         GObject.GObject.__init__(self)
 
 
-class HistoryRow(Gtk.ListBoxRow):
+class Row(Gtk.ListBoxRow):
     """
-        An history row
+        A row
     """
     def __init__(self, item):
         """
             Init row
-            @param item as HistoryItem
+            @param item as Item
         """
         Gtk.ListBoxRow.__init__(self)
         self.__item = item
@@ -70,7 +70,7 @@ class HistoryRow(Gtk.ListBoxRow):
     def item(self):
         """
             Get item
-            @return HistoryItem
+            @return Item
         """
         return self.__item
 
@@ -93,7 +93,28 @@ class UriPopover(Gtk.Popover):
         self.__history_box = builder.get_object('history_box')
         self.__stack = builder.get_object('stack')
         self.__history_box.bind_model(self.__history_model,
-                                      self.__on_history_create)
+                                      self.__on_item_create)
+        self.__bookmarks_model = Gio.ListStore()
+        self.__bookmarks_tree = builder.get_object('bookmarks_tree')
+        self.__bookmarks_tags = builder.get_object('bookmarks_tags')
+        self.__bookmarks_box = builder.get_object('bookmarks_box')
+        self.__bookmarks_box.bind_model(self.__bookmarks_model,
+                                        self.__on_item_create)
+        # self.__bookmarks_tree.set_row_separator_func(self.__row_separator_func)
+        self.__renderer0 = Gtk.CellRendererText()
+        self.__renderer0.set_property('ellipsize-set', True)
+        self.__renderer0.set_property('ellipsize', Pango.EllipsizeMode.END)
+        self.__renderer1 = Gtk.CellRendererPixbuf()
+        # 16px for Gtk.IconSize.MENU
+        self.__renderer1.set_fixed_size(16, -1)
+        column = Gtk.TreeViewColumn('')
+        column.set_expand(True)
+        column.pack_start(self.__renderer0, True)
+        column.add_attribute(self.__renderer0, 'text', 1)
+        column.pack_start(self.__renderer1, False)
+        column.add_attribute(self.__renderer1, 'icon-name', 2)
+        self.__bookmarks_tree.append_column(column)
+        self.__bookmarks_tree.set_property('has_tooltip', True)
         self.add(builder.get_object('widget'))
         self.connect('map', self.__on_map)
 
@@ -105,7 +126,7 @@ class UriPopover(Gtk.Popover):
         self.__history_model.remove_all()
         result = El().history.search(search)
         for (title, uri) in result:
-            item = HistoryItem()
+            item = Item()
             item.set_property("title", title)
             item.set_property("uri", uri)
             self.__history_model.append(item)
@@ -141,11 +162,53 @@ class UriPopover(Gtk.Popover):
 #######################
 # PROTECTED           #
 #######################
+    def _on_selection_changed(self, selection):
+        """
+            Update listbox
+            @param view as Gtk.TreeSelection
+        """
+        (store, iterator) = self.__bookmarks_tree.get_selection(
+                                                               ).get_selected()
+        if iterator is None:
+            return
+        tag_id = self.__bookmarks_tags.get_value(iterator, 0)
+        self.__set_bookmarks(tag_id)
+
+    def _on_history_map(self, widget):
+        """
+            Init history
+            @param widget as Gtk.Widget
+        """
+        self.set_history_text("")
+
+    def _on_bookmarks_map(self, widget):
+        """
+            Init bookmarks
+            @param widget as Gtk.Widget
+        """
+        if len(self.__bookmarks_tags) == 0:
+            for (tag_id, title) in El().bookmarks.get_tags():
+                self.__bookmarks_tags.append([tag_id, title, ""])
+
+    def _on_history_unmap(self, widget):
+        """
+            Clear history
+            @param widget as Gtk.Widget
+        """
+        pass
+
+    def _on_bookmarks_unmap(self, widget):
+        """
+            Clear bookmarks
+            @param widget as Gtk.Widget
+        """
+        pass
+
     def _on_row_activated(self, listbox, row):
         """
             Got to uri
             @param listbox as Gtk.ListBox
-            @param row as HistoryRow
+            @param row as Row
         """
         El().window.container.current.load_uri(row.item.get_property("uri"))
         self.hide()
@@ -153,6 +216,18 @@ class UriPopover(Gtk.Popover):
 #######################
 # PRIVATE             #
 #######################
+    def __set_bookmarks(self, tag_id):
+        """
+            Set bookmarks for tag id
+            @param tag id as int
+        """
+        self.__bookmarks_model.remove_all()
+        for (bookmark_id, title, uri) in El().bookmarks.get_bookmarks(tag_id):
+            item = Item()
+            item.set_property("title", title)
+            item.set_property("uri", uri)
+            self.__bookmarks_model.append(item)
+
     def __on_map(self, widget):
         """
             Resize
@@ -161,10 +236,10 @@ class UriPopover(Gtk.Popover):
         size = El().window.get_size()
         self.set_size_request(size[0]*0.5, size[1]*0.7)
 
-    def __on_history_create(self, item):
+    def __on_item_create(self, item):
         """
-            Add child to history box
-            @param item as HistoryItem
+            Add child to box
+            @param item as Item
         """
-        child = HistoryRow(item)
+        child = Row(item)
         return child
