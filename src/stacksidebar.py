@@ -248,6 +248,8 @@ class StackSidebar(Gtk.Grid):
         for child in self.__listbox.get_children():
             if child.view == visible:
                 child.get_style_context().add_class('sidebar-item-selected')
+                El().window.toolbar.title.set_uri(visible.get_uri())
+                El().window.toolbar.title.set_title(visible.get_title())
             else:
                 child.get_style_context().remove_class('sidebar-item-selected')
 

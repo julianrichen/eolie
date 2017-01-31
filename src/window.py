@@ -35,7 +35,6 @@ class Window(Gtk.ApplicationWindow):
         self.setup_window()
         self.connect('destroy', self.__on_destroyed_window)
         self.connect('realize', self.__on_realize)
-        self.connect('button-press-event', self.__on_button_press)
         self.connect('window-state-event', self.__on_window_state_event)
         self.connect('configure-event', self.__on_configure_event)
 
@@ -155,14 +154,6 @@ class Window(Gtk.ApplicationWindow):
             @param widget as Gtk.Widget
         """
         pass
-
-    def __on_button_press(self, widget, event):
-        """
-            Hide Titlebar popover
-            @param widget as Gtk.Widget
-            @param event as Gdk.Event
-        """
-        self.toolbar.title.hide_popover()
 
     def __on_destroyed_window(self, widget):
         """
