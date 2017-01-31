@@ -101,4 +101,5 @@ class Container(Gtk.Paned):
                 El().window.toolbar.title.set_uri(view.get_uri())
         elif event == WebKit2.LoadEvent.FINISHED:
             if view == self.current:
+                El().window.toolbar.actions.set_actions(view)
                 El().window.toolbar.title.set_title(view.get_title())

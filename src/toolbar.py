@@ -46,6 +46,14 @@ class Toolbar(Gtk.HeaderBar):
         """
         return self.__toolbar_title
 
+    @property
+    def actions(self):
+        """
+            Toolbar actions
+            @return ToolbarActions
+        """
+        return self.__toolbar_actions
+
 #######################
 # PRIVATE             #
 #######################

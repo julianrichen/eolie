@@ -31,26 +31,33 @@ class ToolbarActions(Gtk.Bin):
 
         self.add(builder.get_object('actions'))
 
-        self._prev_btn = builder.get_object('previous_button')
-        self._play_btn = builder.get_object('play_button')
-        self._next_btn = builder.get_object('next_button')
+        self.__back = builder.get_object('back_button')
+        self.__forward = builder.get_object('forward_button')
+
+    def set_actions(self, view):
+        """
+            Set available actions based on view
+            @param view as WebView
+        """
+        self.__back.set_sensitive(view.can_go_back())
+        self.__forward.set_sensitive(view.can_go_forward())
 
 #######################
 # PROTECTED           #
 #######################
-    def _on_prev_button_clicked(self, button):
+    def _on_back_button_clicked(self, button):
         """
-            aa
+            Go backward on current view
             @param button as Gtk.Button
         """
-        pass
+        El().window.container.current.go_back()
 
-    def _on_next_button_clicked(self, button):
+    def _on_forward_button_clicked(self, button):
         """
             aa
             @param button as Gtk.Button
         """
-        pass
+        El().window.container.current.go_forward()
 
     def _on_new_button_clicked(self, button):
         """
