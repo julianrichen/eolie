@@ -59,7 +59,6 @@ class SidebarChild(Gtk.ListBoxRow):
         """
         if event == WebKit2.LoadEvent.STARTED:
             self.__title.set_text(view.get_uri())
-            El().navigation.emit('uri-changed', view.get_uri())
             self.__image.clear()
             self.__image_close.set_from_icon_name('web-browser-symbolic',
                                                   Gtk.IconSize.DIALOG)
@@ -67,8 +66,6 @@ class SidebarChild(Gtk.ListBoxRow):
             title = view.get_title()
             if title is not None:
                 self.__title.set_text(title)
-            El().navigation.emit('title-changed', title)
-            El().navigation.emit('uri-changed', view.get_uri())
             GLib.timeout_add(500, self.__set_preview)
             if view.get_favicon() is not None:
                 GLib.timeout_add(500, self.__set_favicon)

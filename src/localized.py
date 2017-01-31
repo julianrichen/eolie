@@ -10,21 +10,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import GObject, WebKit2
+from locale import strcoll
 
 
-class NavigationManager(GObject.GObject):
+class LocalizedCollation(object):
     """
-        Navigation manager
+        COLLATE LOCALIZED missing from default sqlite installation
+        Android only
     """
-    __gsignals__ = {
-        'uri-changed': (GObject.SignalFlags.RUN_FIRST, None, (str,)),
-        'title-changed': (GObject.SignalFlags.RUN_FIRST, None, (str,))
-    }
 
     def __init__(self):
-        """
-            Init manager
-        """
-        GObject.GObject.__init__(self)
-        self.favicons = WebKit2.FaviconDatabase()
+        pass
+
+    def __call__(self, v1, v2):
+        return strcoll(v1, v2)

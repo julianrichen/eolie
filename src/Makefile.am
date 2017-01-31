@@ -3,10 +3,13 @@ appdir = $(pythondir)/eolie/
 app_PYTHON = \
     application.py\
     container.py\
+    database_history.py\
     define.py\
-    navigation_manager.py\
+    localized.py\
     settings.py\
     stacksidebar.py\
+    sqlcursor.py\
+    utils.py\
     toolbar.py\
     toolbar_actions.py\
     toolbar_end.py\

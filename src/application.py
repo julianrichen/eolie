@@ -19,7 +19,7 @@ from gettext import gettext as _
 
 from eolie.settings import Settings
 from eolie.window import Window
-from eolie.navigation_manager import NavigationManager
+from eolie.database_history import DatabaseHistory
 
 
 class Application(Gtk.Application):
@@ -56,6 +56,7 @@ class Application(Gtk.Application):
 
         self.window = None
         self.debug = False
+        self.cursors = {}
         GLib.set_application_name('Eolie')
         GLib.set_prgname('eolie')
         self.connect('activate', self.__on_activate)
@@ -81,7 +82,7 @@ class Application(Gtk.Application):
         styleContext.add_provider_for_screen(screen, cssProvider,
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.settings = Settings.new()
-        self.navigation = NavigationManager()
+        self.history = DatabaseHistory()
         # Set some WebKit defaults
         context = WebKit2.WebContext.get_default()
         data_manager = WebKit2.WebsiteDataManager()
