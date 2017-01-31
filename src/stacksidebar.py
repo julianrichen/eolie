@@ -98,8 +98,14 @@ class SidebarChild(Gtk.ListBoxRow):
             @param eventbox as Gtk.EventBox
             @param event as Gdk.Event
         """
-        self.__image_close.get_style_context().remove_class('sidebar-close')
-        self.__on_notify_favicon(self.__view, None)
+        allocation = eventbox.get_allocation()
+        if event.x <= 0 or\
+           event.x >= allocation.width or\
+           event.y <= 0 or\
+           event.y >= allocation.height:
+            self.__image_close.get_style_context().remove_class(
+                                                               'sidebar-close')
+            self.__on_notify_favicon(self.__view, None)
 
 #######################
 # PRIVATE             #
