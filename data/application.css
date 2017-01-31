@@ -5,7 +5,7 @@
 
 .sidebarchild-title {
     background-color: @theme_selected_fg_color;
-    opacity: 0.9;
+    opacity: 0.97;
 }
 
 .sidebarchild-image {

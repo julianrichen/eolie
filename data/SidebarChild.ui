@@ -39,9 +39,6 @@
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
                 <property name="ellipsize">end</property>
-                <attributes>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
