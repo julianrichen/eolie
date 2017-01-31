@@ -30,6 +30,11 @@
     background-color: @theme_selected_bg_color;
 }
 
-.urlbar {
-    padding-right: 30px;
+.uribar {
+    padding-right: 28px;
+}
+
+.uribar-title {
+    background-color: transparent;
+    background-image: none;
 }

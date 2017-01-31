@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, WebKit2
 
 from eolie.stacksidebar import StackSidebar
 from eolie.define import El
@@ -96,5 +96,9 @@ class Container(Gtk.Paned):
             @param event as WebKit2.LoadEvent
         """
         self.__stack_sidebar.on_load_changed(view, event)
-        if view == self.current and view.get_uri() is not None:
-            El().window.toolbar.title.set_uri(view.get_uri())
+        if event == WebKit2.LoadEvent.STARTED:
+            if view == self.current:
+                El().window.toolbar.title.set_uri(view.get_uri())
+        elif event == WebKit2.LoadEvent.FINISHED:
+            if view == self.current:
+                El().window.toolbar.title.set_title(view.get_title())
