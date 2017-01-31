@@ -60,16 +60,19 @@ class DatabaseHistory:
             except Exception as e:
                 print("DatabaseHistory::__init__(): %s" % e)
 
-    def add(self, title, uri):
+    def add(self, title, uri, mtime=None):
         """
             Add a new entry to history, if exists, update it
             @param title as str
             @param uri as str
+            @param mtime as int
         """
         if not uri:
             return
         if title is None:
             title = ""
+        if mtime is None:
+            mtime = int(time())
         with SqlCursor(self) as sql:
             result = sql.execute("SELECT popularity FROM history\
                                   WHERE uri=?", (uri,))
@@ -81,7 +84,7 @@ class DatabaseHistory:
                 sql.execute("INSERT INTO history\
                                   (title, uri, mtime, popularity)\
                                   VALUES (?, ?, ?, ?)",
-                            (title, uri, int(time()), 0))
+                            (title, uri, mtime, 0))
             sql.commit()
 
     def search(self, search):

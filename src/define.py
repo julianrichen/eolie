@@ -19,3 +19,9 @@ class ArtSize:
     FAVICON = 22
     PREVIEW_HEIGHT = 60
     PREVIEW_WIDTH_MARGIN = 10
+
+
+class BookmarksType:
+    POPULARS = -1
+    RECENTS = -2
+    SEPARATOR = -3

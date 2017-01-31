@@ -96,7 +96,7 @@ class DatabaseBookmarks:
                             (bookmarks_id, tag_id))
             sql.commit()
             # We need this as current db is attached to history
-            El().history.add(title, uri)
+            El().history.add(title, uri, 0)
 
     def get_id(self, uri):
         """
@@ -154,6 +154,36 @@ class DatabaseBookmarks:
                             AND history.uri=bookmarks.uri\
                             ORDER BY history.popularity DESC",
                                  (tag_id,))
+            return list(result)
+
+    def get_populars(self):
+        """
+            Get popular bookmarks
+        """
+        with SqlCursor(self) as sql:
+            result = sql.execute("\
+                            SELECT bookmarks.rowid,\
+                                   bookmarks.title,\
+                                   bookmarks.uri\
+                            FROM bookmarks, history.history\
+                            WHERE history.uri=bookmarks.uri\
+                            AND history.popularity!=0\
+                            ORDER BY history.popularity DESC")
+            return list(result)
+
+    def get_recents(self):
+        """
+            Get recents bookmarks
+        """
+        with SqlCursor(self) as sql:
+            result = sql.execute("\
+                            SELECT bookmarks.rowid,\
+                                   bookmarks.title,\
+                                   bookmarks.uri\
+                            FROM bookmarks, history.history\
+                            WHERE history.uri=bookmarks.uri\
+                            AND history.mtime != 0\
+                            ORDER BY history.mtime DESC")
             return list(result)
 
     def import_firefox(self):

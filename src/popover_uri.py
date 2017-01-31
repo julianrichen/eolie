@@ -12,7 +12,9 @@
 
 from gi.repository import Gtk, Gdk, GObject, Gio, Pango
 
-from eolie.define import El, ArtSize
+from gettext import gettext as _
+
+from eolie.define import El, ArtSize, BookmarksType
 
 
 class Item(GObject.GObject):
@@ -101,7 +103,7 @@ class UriPopover(Gtk.Popover):
         self.__bookmarks_box = builder.get_object('bookmarks_box')
         self.__bookmarks_box.bind_model(self.__bookmarks_model,
                                         self.__on_item_create)
-        # self.__bookmarks_tree.set_row_separator_func(self.__row_separator_func)
+        self.__bookmarks_tree.set_row_separator_func(self.__row_separator_func)
         self.__renderer0 = Gtk.CellRendererText()
         self.__renderer0.set_property('ellipsize-set', True)
         self.__renderer0.set_property('ellipsize', Pango.EllipsizeMode.END)
@@ -184,8 +186,17 @@ class UriPopover(Gtk.Popover):
             @param widget as Gtk.Widget
         """
         if len(self.__bookmarks_tags) == 0:
+            self.__bookmarks_tags.append([BookmarksType.POPULARS,
+                                          _("Populars"),
+                                          "starred-symbolic"])
+            self.__bookmarks_tags.append([BookmarksType.RECENTS,
+                                          _("Recents"),
+                                          "document-open-recent-symbolic"])
+            self.__bookmarks_tags.append([BookmarksType.SEPARATOR, "", ""])
             for (tag_id, title) in El().bookmarks.get_tags():
                 self.__bookmarks_tags.append([tag_id, title, ""])
+            self.__bookmarks_tree.get_selection().select_iter(
+                                                 self.__bookmarks_tags[0].iter)
 
     def _on_history_unmap(self, widget):
         """
@@ -213,6 +224,14 @@ class UriPopover(Gtk.Popover):
 #######################
 # PRIVATE             #
 #######################
+    def __row_separator_func(self, model, iterator):
+        """
+            Draw a separator if needed
+            @param model as Gtk.TreeModel
+            @param iterator as Gtk.TreeIter
+        """
+        return model.get_value(iterator, 0) == BookmarksType.SEPARATOR
+
     def __set_history_text(self, search):
         """
             Set history model
@@ -231,7 +250,13 @@ class UriPopover(Gtk.Popover):
             @param tag id as int
         """
         self.__bookmarks_model.remove_all()
-        for (bookmark_id, title, uri) in El().bookmarks.get_bookmarks(tag_id):
+        if tag_id == BookmarksType.POPULARS:
+            items = El().bookmarks.get_populars()
+        elif tag_id == BookmarksType.RECENTS:
+            items = El().bookmarks.get_recents()
+        else:
+            items = El().bookmarks.get_bookmarks(tag_id)
+        for (bookmark_id, title, uri) in items:
             item = Item()
             item.set_property("title", title)
             item.set_property("uri", uri)
