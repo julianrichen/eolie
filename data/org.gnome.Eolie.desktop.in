@@ -6,5 +6,6 @@ Icon=web-browser
 Exec=eolie %U
 Terminal=false
 Type=Application
-Categories=GNOME;
+Categories=Network;GNOME;GTK;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;multipart/related;application/x-mimearchive;message/rfc822;
 StartupNotify=true

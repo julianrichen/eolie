@@ -65,6 +65,14 @@ class ToolbarTitle(Gtk.Bin):
                 self.__entry.set_text("")
                 self.__entry.get_style_context().add_class('uribar-title')
 
+    def hide_popover(self):
+        """
+            hide popover if needed
+        """
+        if self.__popover.is_visible():
+            self.__popover.hide()
+            El().window.set_focus(None)
+
 #######################
 # PROTECTED           #
 #######################

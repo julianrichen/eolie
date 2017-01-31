@@ -49,6 +49,7 @@ class Container(Gtk.Paned):
         if uri is None:
             uri = "about:blank"
         view = WebView()
+        view.connect('button-press-event', self.__on_button_press)
         view.connect('load-changed', self.__on_load_changed)
         if uri != "about:blank":
             view.load_uri(uri)
@@ -89,6 +90,14 @@ class Container(Gtk.Paned):
 #######################
 # PRIVATE             #
 #######################
+    def __on_button_press(self, widget, event):
+        """
+            Hide Titlebar popover
+            @param widget as Gtk.Widget
+            @param event as Gdk.Event
+        """
+        El().window.toolbar.title.hide_popover()
+
     def __on_load_changed(self, view, event):
         """
             Update sidebar/urlbar
