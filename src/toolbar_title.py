@@ -28,6 +28,7 @@ class ToolbarTitle(Gtk.Bin):
         Gtk.Bin.__init__(self)
         self.__uri = ""
         self.__lock = False
+        self.__signal_id = None
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
         builder.connect_signals(self)
@@ -107,6 +108,8 @@ class ToolbarTitle(Gtk.Bin):
         self.__popover.set_relative_to(self)
         self.__popover.show()
         self.__popover.set_history_text("")
+        self.__signal_id = self.__entry.connect('changed',
+                                                self.__on_entry_changed)
 
     def _on_entry_focus_out(self, entry, event):
         """
@@ -115,6 +118,9 @@ class ToolbarTitle(Gtk.Bin):
             @param event as Gdk.Event
         """
         self.__lock = False
+        if self.__signal_id is not None:
+            self.__entry.disconnect(self.__signal_id)
+            self.__signal_id = None
         if self.__entry.get_placeholder_text():
             self.__entry.set_text("")
             self.__entry.get_style_context().add_class('uribar-title')
@@ -128,7 +134,6 @@ class ToolbarTitle(Gtk.Bin):
         """
         if event.keyval in [Gdk.KEY_Down, Gdk.KEY_Up]:
             self.__popover.send_event_to_history(event)
-            entry.set_text(self.__uri)
             return True
         elif event.keyval == Gdk.KEY_Return and entry.get_text() == self.__uri:
             self.__popover.send_event_to_history(event)
