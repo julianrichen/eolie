@@ -112,6 +112,8 @@ class Window(Gtk.ApplicationWindow):
             @param: widget as Gtk.Window
             @param: event as Gdk.Event
         """
+        size = widget.get_size()
+        self.toolbar.title.set_width(size[0]/3)
         if self.__timeout_configure:
             GLib.source_remove(self.__timeout_configure)
             self.__timeout_configure = None
@@ -140,6 +142,8 @@ class Window(Gtk.ApplicationWindow):
         """
             Save maximised state
         """
+        size = widget.get_size()
+        self.toolbar.title.set_width(size[0]/3)
         El().settings.set_boolean('window-maximized',
                                   'GDK_WINDOW_STATE_MAXIMIZED' in
                                   event.new_window_state.value_names)

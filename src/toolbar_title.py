@@ -33,7 +33,6 @@ class ToolbarTitle(Gtk.Bin):
         self.__entry = builder.get_object('entry')
         self.__reload_image = builder.get_object('reload_image')
         self.add(builder.get_object('widget'))
-        self.set_width(400)
 
     def set_width(self, width):
         """
