@@ -21,6 +21,7 @@ from eolie.settings import Settings
 from eolie.window import Window
 from eolie.art import Art
 from eolie.database_history import DatabaseHistory
+from eolie.database_bookmarks import DatabaseBookmarks
 
 
 class Application(Gtk.Application):
@@ -84,6 +85,8 @@ class Application(Gtk.Application):
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.settings = Settings.new()
         self.history = DatabaseHistory()
+        self.bookmarks = DatabaseBookmarks()
+        self.bookmarks.import_firefox()
         self.art = Art()
         # Set some WebKit defaults
         context = WebKit2.WebContext.get_default()
