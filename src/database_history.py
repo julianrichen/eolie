@@ -95,7 +95,7 @@ class DatabaseHistory:
                                   FROM history\
                                   WHERE title LIKE ?\
                                    OR uri LIKE ?\
-                                  ORDER BY popularity DESC, mtime DESC",
+                                  ORDER BY mtime DESC",
                                  (filter, filter))
             return list(result)
 

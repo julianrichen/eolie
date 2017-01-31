@@ -92,6 +92,7 @@ class UriPopover(Gtk.Popover):
         self.__history_model = Gio.ListStore()
         self.__history_box = builder.get_object('history_box')
         self.__stack = builder.get_object('stack')
+        self.__stack.set_visible_child_name("bookmarks")
         self.__history_box.bind_model(self.__history_model,
                                       self.__on_item_create)
         self.__bookmarks_model = Gio.ListStore()
@@ -124,12 +125,8 @@ class UriPopover(Gtk.Popover):
             @param search as str
         """
         self.__history_model.remove_all()
-        result = El().history.search(search)
-        for (title, uri) in result:
-            item = Item()
-            item.set_property("title", title)
-            item.set_property("uri", uri)
-            self.__history_model.append(item)
+        self.__stack.set_visible_child_name("search")
+        self.__set_history_text(search)
 
     def send_event_to_history(self, event):
         """
@@ -216,6 +213,18 @@ class UriPopover(Gtk.Popover):
 #######################
 # PRIVATE             #
 #######################
+    def __set_history_text(self, search):
+        """
+            Set history model
+            @param search as str
+        """
+        result = El().history.search(search)
+        for (title, uri) in result:
+            item = Item()
+            item.set_property("title", title)
+            item.set_property("uri", uri)
+            self.__history_model.append(item)
+
     def __set_bookmarks(self, tag_id):
         """
             Set bookmarks for tag id
