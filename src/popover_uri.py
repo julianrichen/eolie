@@ -98,6 +98,7 @@ class UriPopover(Gtk.Popover):
         self.__history_box.bind_model(self.__history_model,
                                       self.__on_item_create)
         self.__bookmarks_model = Gio.ListStore()
+        self.__scrolled_bookmarks = builder.get_object('scrolled_bookmarks')
         self.__bookmarks_tree = builder.get_object('bookmarks_tree')
         self.__bookmarks_tags = builder.get_object('bookmarks_tags')
         self.__bookmarks_box = builder.get_object('bookmarks_box')
@@ -269,6 +270,7 @@ class UriPopover(Gtk.Popover):
         """
         size = El().window.get_size()
         self.set_size_request(size[0]*0.5, size[1]*0.7)
+        self.__scrolled_bookmarks.set_size_request(size[1]*0.7*0.33, -1)
 
     def __on_item_create(self, item):
         """
