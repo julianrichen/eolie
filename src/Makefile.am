@@ -2,6 +2,7 @@ appdir = $(pythondir)/eolie/
 
 app_PYTHON = \
     application.py\
+    art.py\
     container.py\
     database_history.py\
     define.py\

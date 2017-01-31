@@ -12,7 +12,7 @@
 
 from gi.repository import Gtk, Gdk, GObject, Gio, Pango
 
-from eolie.define import El
+from eolie.define import El, ArtSize
 
 
 class HistoryItem(GObject.GObject):
@@ -40,14 +40,26 @@ class HistoryRow(Gtk.ListBoxRow):
         grid.set_column_spacing(10)
         grid.set_hexpand(True)
         grid.set_property('valign', Gtk.Align.CENTER)
-        grid.set_column_homogeneous(True)
+        surface = El().art.get_artwork(item.get_property("uri"),
+                                       "favicon",
+                                       self.get_scale_factor(),
+                                       ArtSize.FAVICON,
+                                       ArtSize.FAVICON)
+        favicon = Gtk.Image.new_from_surface(surface)
+        favicon.set_size_request(ArtSize.FAVICON*2, -1)
+        if surface is not None:
+            del surface
+        favicon.show()
         title = Gtk.Label.new(item.get_property("title"))
         title.set_ellipsize(Pango.EllipsizeMode.END)
         title.set_property('halign', Gtk.Align.START)
+        title.set_hexpand(True)
         uri = Gtk.Label.new(item.get_property("uri"))
         uri.set_ellipsize(Pango.EllipsizeMode.END)
-        uri.set_property('halign', Gtk.Align.START)
+        uri.set_property('halign', Gtk.Align.END)
         uri.get_style_context().add_class('dim-label')
+        uri.set_max_width_chars(40)
+        grid.add(favicon)
         grid.add(title)
         grid.add(uri)
         grid.show_all()

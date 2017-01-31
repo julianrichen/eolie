@@ -13,14 +13,13 @@
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, WebKit2
 import cairo
 
-from eolie.define import El
+from eolie.define import El, ArtSize
 
 
 class SidebarChild(Gtk.ListBoxRow):
     """
         A Sidebar Child
     """
-    __HEIGHT = 60
 
     def __init__(self, view):
         """
@@ -59,9 +58,28 @@ class SidebarChild(Gtk.ListBoxRow):
         """
         if event == WebKit2.LoadEvent.STARTED:
             self.__title.set_text(view.get_uri())
-            self.__image.clear()
-            self.__image_close.set_from_icon_name('web-browser-symbolic',
-                                                  Gtk.IconSize.DIALOG)
+            preview = El().art.get_artwork(view.get_uri(),
+                                           "preview",
+                                           view.get_scale_factor(),
+                                           self.get_allocated_width() -
+                                           ArtSize.PREVIEW_WIDTH_MARGIN,
+                                           ArtSize.PREVIEW_HEIGHT)
+            if preview is not None:
+                self.__image.set_from_surface(preview)
+                del preview
+            else:
+                self.__image.clear()
+            favicon = El().art.get_artwork(view.get_uri(),
+                                           "favicon",
+                                           view.get_scale_factor(),
+                                           ArtSize.FAVICON,
+                                           ArtSize.FAVICON)
+            if favicon is not None:
+                self.__image_close.set_from_surface(favicon)
+                del favicon
+            else:
+                self.__image_close.set_from_icon_name('web-browser-symbolic',
+                                                      Gtk.IconSize.DIALOG)
         elif event == WebKit2.LoadEvent.FINISHED:
             title = view.get_title()
             if title is not None:
@@ -117,7 +135,9 @@ class SidebarChild(Gtk.ListBoxRow):
         pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0,
                                              surface.get_width(),
                                              surface.get_height())
-        scaled = pixbuf.scale_simple(22, 22, GdkPixbuf.InterpType.BILINEAR)
+        scaled = pixbuf.scale_simple(ArtSize.FAVICON,
+                                     ArtSize.FAVICON,
+                                     GdkPixbuf.InterpType.BILINEAR)
         del pixbuf
         s = Gdk.cairo_surface_create_from_pixbuf(scaled,
                                                  self.get_scale_factor(), None)
@@ -133,6 +153,7 @@ class SidebarChild(Gtk.ListBoxRow):
             self.__image_close.set_from_icon_name('web-browser-symbolic',
                                                   Gtk.IconSize.DIALOG)
             return
+        El().art.save_artwork(self.__view.get_uri(), surface, "favicon")
         self.__image_close.set_from_surface(surface)
         del surface
         self.__image_close.get_style_context().remove_class('sidebar-close')
@@ -159,8 +180,9 @@ class SidebarChild(Gtk.ListBoxRow):
         except:
             return
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
-                                     self.get_allocated_width() - 10,
-                                     self.__HEIGHT)
+                                     self.get_allocated_width() -
+                                     ArtSize.PREVIEW_WIDTH_MARGIN,
+                                     ArtSize.PREVIEW_HEIGHT)
         context = cairo.Context(surface)
         context.set_source_surface(snapshot)
         factor = self.get_allocated_width() /\
@@ -168,6 +190,7 @@ class SidebarChild(Gtk.ListBoxRow):
         context.scale(factor, factor)
         self.__view.draw(context)
         self.__image.set_from_surface(surface)
+        El().art.save_artwork(self.__view.get_uri(), surface, "preview")
         del surface
 
     def __on_notify_favicon(self, view, pointer):

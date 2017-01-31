@@ -19,6 +19,7 @@ from gettext import gettext as _
 
 from eolie.settings import Settings
 from eolie.window import Window
+from eolie.art import Art
 from eolie.database_history import DatabaseHistory
 
 
@@ -83,6 +84,7 @@ class Application(Gtk.Application):
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.settings = Settings.new()
         self.history = DatabaseHistory()
+        self.art = Art()
         # Set some WebKit defaults
         context = WebKit2.WebContext.get_default()
         data_manager = WebKit2.WebsiteDataManager()

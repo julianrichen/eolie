@@ -13,3 +13,9 @@
 from gi.repository import Gio
 
 El = Gio.Application.get_default
+
+
+class ArtSize:
+    FAVICON = 22
+    PREVIEW_HEIGHT = 60
+    PREVIEW_WIDTH_MARGIN = 10
