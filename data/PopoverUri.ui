@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.20.0 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkGrid" id="widget">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkStackSwitcher">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="halign">center</property>
+        <property name="hexpand">True</property>
+        <property name="stack">stack</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
+        <property name="shadow_type">in</property>
+        <child>
+          <object class="GtkViewport">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkStack" id="stack">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="transition_type">crossfade</property>
+                <child>
+                  <object class="GtkListBox" id="history_box">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <signal name="row-activated" handler="_on_row_activated" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="name">history</property>
+                    <property name="title" translatable="yes">History</property>
+                    <property name="icon_name">preferences-system-time-symbolic</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+  </object>
+</interface>

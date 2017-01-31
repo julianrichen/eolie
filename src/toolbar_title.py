@@ -10,9 +10,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 from eolie.define import El
+from eolie.popover_uri import UriPopover
 
 
 class ToolbarTitle(Gtk.Bin):
@@ -31,6 +32,7 @@ class ToolbarTitle(Gtk.Bin):
         builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
         builder.connect_signals(self)
         self.__entry = builder.get_object('entry')
+        self.__popover = UriPopover()
         self.__reload_image = builder.get_object('reload_image')
         self.add(builder.get_object('widget'))
 
@@ -71,8 +73,10 @@ class ToolbarTitle(Gtk.Bin):
             @param eventbox as Gtk.EventBox
             @param event as Gdk.Event
         """
-        self.__entry.set_text(self.__uri)
-        self.__entry.get_style_context().remove_class('uribar-title')
+        current_text = self.__entry.get_text()
+        if current_text == "":
+            self.__entry.set_text(self.__uri)
+            self.__entry.get_style_context().remove_class('uribar-title')
 
     def _on_leave_notify(self, eventbox, event):
         """
@@ -85,7 +89,9 @@ class ToolbarTitle(Gtk.Bin):
            event.x >= allocation.width or\
            event.y <= 0 or\
            event.y >= allocation.height:
-            if self.__entry.get_placeholder_text() and not self.__lock:
+            if self.__entry.get_placeholder_text() and\
+                    self.__entry.get_text() and\
+                    not self.__lock:
                 self.__entry.set_text("")
                 self.__entry.get_style_context().add_class('uribar-title')
 
@@ -98,6 +104,9 @@ class ToolbarTitle(Gtk.Bin):
         self.__lock = True
         self.__entry.set_text(self.__uri)
         self.__entry.get_style_context().remove_class('uribar-title')
+        self.__popover.set_relative_to(self)
+        self.__popover.show()
+        self.__popover.set_history_text("")
 
     def _on_entry_focus_out(self, entry, event):
         """
@@ -109,6 +118,21 @@ class ToolbarTitle(Gtk.Bin):
         if self.__entry.get_placeholder_text():
             self.__entry.set_text("")
             self.__entry.get_style_context().add_class('uribar-title')
+            self.__popover.hide()
+
+    def _on_key_press_event(self, entry, event):
+        """
+            Forward to popover history listbox if needed
+            @param entry as Gtk.Entry
+            @param event as Gdk.Event
+        """
+        if event.keyval in [Gdk.KEY_Down, Gdk.KEY_Up]:
+            self.__popover.send_event_to_history(event)
+            entry.set_text(self.__uri)
+            return True
+        elif event.keyval == Gdk.KEY_Return and entry.get_text() == self.__uri:
+            self.__popover.send_event_to_history(event)
+            return True
 
     def _on_reload_press(self, eventbox, event):
         """
@@ -141,6 +165,16 @@ class ToolbarTitle(Gtk.Bin):
         """
         text = entry.get_text()
         El().window.container.load_uri(text)
+
 #######################
 # PRIVATE             #
 #######################
+    def __on_entry_changed(self, entry):
+        """
+            Update popover search if needed
+        """
+        value = entry.get_text()
+        if value == self.__uri:
+            self.__popover.set_history_text("")
+        else:
+            self.__popover.set_history_text(value)

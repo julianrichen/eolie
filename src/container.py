@@ -96,10 +96,9 @@ class Container(Gtk.Paned):
             @param event as WebKit2.LoadEvent
         """
         self.__stack_sidebar.on_load_changed(view, event)
-        if event == WebKit2.LoadEvent.STARTED:
-            if view == self.current:
-                El().window.toolbar.title.set_uri(view.get_uri())
-        elif event == WebKit2.LoadEvent.FINISHED:
+        if view == self.current:
+            El().window.toolbar.title.set_uri(view.get_uri())
+        if event == WebKit2.LoadEvent.FINISHED:
             El().history.add(view.get_title(), view.get_uri())
             if view == self.current:
                 El().window.toolbar.actions.set_actions(view)

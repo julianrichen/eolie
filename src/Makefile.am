@@ -6,6 +6,7 @@ app_PYTHON = \
     database_history.py\
     define.py\
     localized.py\
+    popover_uri.py\
     settings.py\
     stacksidebar.py\
     sqlcursor.py\

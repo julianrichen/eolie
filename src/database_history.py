@@ -85,6 +85,21 @@ class DatabaseHistory:
                             (title, uri, int(time()), 0))
             sql.commit()
 
+    def search(self, search):
+        """
+            Search string in db (uri and title)
+            @param search as str
+        """
+        with SqlCursor(El().history) as sql:
+            filter = '%' + search + '%'
+            result = sql.execute("SELECT title, uri\
+                                  FROM history\
+                                  WHERE title LIKE ?\
+                                   OR uri LIKE ?\
+                                  ORDER BY popularity DESC, mtime DESC",
+                                 (filter, filter))
+            return list(result)
+
     def get_cursor(self):
         """
             Return a new sqlite cursor
