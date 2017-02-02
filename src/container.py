@@ -151,6 +151,8 @@ class Container(Gtk.Paned):
         if event == WebKit2.LoadEvent.FINISHED:
             self.__progress.hide()
             El().history.add(view.get_title(), view.get_uri())
+            if view.get_uri() != view.loaded_uri:
+                El().history.add(view.get_title(), view.loaded_uri)
             if view == self.current:
                 El().window.toolbar.actions.set_actions(view)
                 El().window.toolbar.title.set_title(view.get_title())
