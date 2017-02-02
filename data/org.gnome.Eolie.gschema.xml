@@ -16,9 +16,14 @@
             <summary>Window maximized</summary>
             <description>Window maximized state.</description>
         </key>
-	<key type="i" name="paned-width">
+	    <key type="i" name="paned-width">
             <default>200</default>
             <summary>INTERNAL</summary>
+            <description></description>
+        </key>
+	    <key type="b" name="adblock">
+            <default>true</default>
+            <summary>Block ads on pages</summary>
             <description></description>
         </key>
     </schema>

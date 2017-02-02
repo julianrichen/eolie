@@ -3,11 +3,16 @@ NULL =
 
 bin_SCRIPTS = eolie
 
-SUBDIRS = src data
+SUBDIRS = src data python-webextension
 
 EXTRA_DIST = \
 	eolie.in\
+	python-webextension/extension.py.in\
 	$(NULL)
+
+webkitextensiondir = $(datadir)/eolie/webkitextension
+webkitextension_DATA = python-webextension/pythonloader.so python-webextension/extension.py
+
 
 CLEANFILES = \
 	$(bin_SCRIPTS)\
@@ -33,6 +38,13 @@ MAINTAINERCLEANFILES = \
 GITIGNOREFILES = \
 	m4 \
 	$(NULL)
+
+python-webextension/extension.py: python-webextension/extension.py.in Makefile
+	$(AM_V_GEN)sed                                          \
+		-e s!\@pythondir\@!$(pythondir)!        \
+		-e s!\@pyexecdir\@!$(pyexecdir)!        \
+		< $< > $@
+	chmod a+x $@
 
 eolie: eolie.in Makefile
 	$(AM_V_GEN)sed						\

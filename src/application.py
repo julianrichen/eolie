@@ -23,6 +23,8 @@ from eolie.window import Window
 from eolie.art import Art
 from eolie.database_history import DatabaseHistory
 from eolie.database_bookmarks import DatabaseBookmarks
+from eolie.database_adblock import DatabaseAdblock
+from eolie.sqlcursor import SqlCursor
 from eolie.search import Search
 
 
@@ -38,9 +40,10 @@ class Application(Gtk.Application):
     __COOKIES_PATH = "%s/cookies.db" % __LOCAL_PATH
     __FAVICONS_PATH = "%s/favicons" % __LOCAL_PATH
 
-    def __init__(self):
+    def __init__(self, extension_dir):
         """
             Create application
+            @param extension_dir as str
         """
         Gtk.Application.__init__(
                             self,
@@ -57,7 +60,7 @@ class Application(Gtk.Application):
                 if GLib.file_test(path, GLib.FileTest.EXISTS):
                     GLib.setenv('SSL_CERT_FILE', path, True)
                     break
-
+        self.__extension_dir = extension_dir
         self.window = None
         self.debug = False
         self.cursors = {}
@@ -88,7 +91,12 @@ class Application(Gtk.Application):
         self.settings = Settings.new()
         self.history = DatabaseHistory()
         self.bookmarks = DatabaseBookmarks()
+        # We store cursors for main thread
+        SqlCursor.add(self.history)
+        SqlCursor.add(self.bookmarks)
         self.bookmarks.import_firefox()
+        adblock = DatabaseAdblock()
+        adblock.update()
         self.art = Art()
         self.search = Search()
 
@@ -102,6 +110,9 @@ class Application(Gtk.Application):
 
         # Set some WebKit defaults
         context = WebKit2.WebContext.get_default()
+        GLib.setenv('PYTHONPATH', self.__extension_dir, True)
+        context.set_web_extensions_directory(self.__extension_dir)
+
         data_manager = WebKit2.WebsiteDataManager()
         context.new_with_website_data_manager(data_manager)
         context.set_process_model(

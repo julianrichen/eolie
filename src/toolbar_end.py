@@ -10,7 +10,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, GLib
+
+from eolie.define import El
 
 
 class ToolbarEnd(Gtk.Bin):
@@ -25,12 +27,28 @@ class ToolbarEnd(Gtk.Bin):
         Gtk.Bin.__init__(self)
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarEnd.ui')
-        # builder.connect_signals(self)
-
+        builder.connect_signals(self)
+        if El().settings.get_value('adblock'):
+            builder.get_object(
+                         'adblock_button').get_style_context().add_class('red')
         self.add(builder.get_object('end'))
 
 #######################
 # PROTECTED           #
+#######################
+    def _on_adblock_clicked(self, button):
+        """
+            Switch add blocking on/off
+            @param button as Gtk.Button
+        """
+        value = not El().settings.get_value('adblock')
+        El().settings.set_value('adblock',
+                                GLib.Variant('b', value))
+        if value:
+            button.get_style_context().add_class('red')
+        else:
+            button.get_style_context().remove_class('red')
+
 #######################
 # PRIVATE             #
 #######################

@@ -19,6 +19,8 @@ from gi.repository import Gio
 localedir = '@localedir@'
 pkgdatadir = '@pkgdatadir@'
 
+sys.path.insert(1, '@pkgdatadir@/webextension')
+
 from eolie.application import Application
 
 def install_excepthook():
@@ -44,7 +46,7 @@ if __name__ == "__main__":
     resource = Gio.resource_load(os.path.join(pkgdatadir, 'eolie.gresource'))
     Gio.Resource._register(resource)
 
-    app = Application()
+    app = Application(os.path.join(pkgdatadir, 'webkitextension'))
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     if 'EOLIE_TRACE' in os.environ:
         graphviz = GraphvizOutput()

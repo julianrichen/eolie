@@ -8,12 +8,13 @@
     <property name="vexpand">False</property>
     <property name="spacing">6</property>
     <child>
-      <object class="GtkButton" id="adblock-button">
+      <object class="GtkButton" id="adblock_button">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="receives_default">False</property>
         <property name="tooltip_text" translatable="yes">Hide ads</property>
         <property name="valign">center</property>
+        <signal name="clicked" handler="_on_adblock_clicked" swapped="no"/>
         <child>
           <object class="GtkImage" id="adblock-button-image">
             <property name="visible">True</property>

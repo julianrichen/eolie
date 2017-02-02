@@ -54,3 +54,7 @@
     background-color: transparent;
     background-image: none;
 }
+
+.red {
+    color: shade(red, 0.8)
+}

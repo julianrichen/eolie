@@ -28,6 +28,8 @@ GOBJECT_INTROSPECTION_REQUIRE([1.35.9])
 PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.14])
 
 GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable glib_compile_resources gio-2.0`
+WEB_EXT_FLAGS=`$PKG_CONFIG pygobject-3.0 webkit2gtk-web-extension-4.0 python3 --cflags`
+WEB_EXT_LIBS=`$PKG_CONFIG pygobject-3.0 webkit2gtk-web-extension-4.0 python3 --libs`
 AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CONFIG_FILES([

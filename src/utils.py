@@ -12,6 +12,8 @@
 
 import unicodedata
 
+from eolie.define import El
+
 
 def noaccents(string):
         """
@@ -21,3 +23,12 @@ def noaccents(string):
         """
         nfkd_form = unicodedata.normalize('NFKD', string)
         return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+
+def debug(str):
+    """
+        Print debug
+        @param debug as str
+    """
+    if El().debug is True:
+        print(str)

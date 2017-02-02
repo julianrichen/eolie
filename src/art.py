@@ -1,10 +1,4 @@
 # Copyright (c) 2014-2016 Cedric Bellegarde <cedric.bellegarde@adishatz.org>
-# Copyright (c) 2013 Vadim Rutkovsky <vrutkovs@redhat.com>
-# Copyright (c) 2013 Arnel A. Borja <kyoushuu@yahoo.com>
-# Copyright (c) 2013 Seif Lotfy <seif@lotfy.com>
-# Copyright (c) 2013 Guillaume Quintard <guillaume.quintard@gmail.com>
-# Copyright (c) 2013 Lubosz Sarnecki <lubosz@gmail.com>
-# Copyright (c) 2013 Sai Suman Prayaga <suman.sai14@gmail.com>
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
