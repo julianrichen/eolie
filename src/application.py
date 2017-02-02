@@ -45,6 +45,7 @@ class Application(Gtk.Application):
                             application_id='org.gnome.Eolie',
                             flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
         self.set_property('register-session', True)
+        GLib.setenv("WEBKIT_DISABLE_COMPOSITING_MODE", "1", True)
         # Ideally, we will be able to delete this once Flatpak has a solution
         # for SSL certificate management inside of applications.
         if GLib.file_test("/app", GLib.FileTest.EXISTS):
