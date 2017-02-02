@@ -12,6 +12,8 @@
 
 from gi.repository import WebKit2
 
+from eolie.define import El
+
 
 class WebView(WebKit2.WebView):
     """
@@ -44,6 +46,7 @@ class WebView(WebKit2.WebView):
         settings.set_property("media-playback-allows-inline", True)
         self.set_settings(settings)
         self.show()
+        self.connect('decide-policy', self.__on_decide_policy)
 
     def load_uri(self, uri):
         """
@@ -57,3 +60,24 @@ class WebView(WebKit2.WebView):
 #######################
 # PRIVATE             #
 #######################
+    def __on_decide_policy(self, view, decision, decision_type):
+        """
+            Navigation policy
+            @param view as WebKit2.WebView
+            @param decision as WebKit2.NavigationPolicyDecision
+            @param decision_type as WebKit2.PolicyDecisionType
+            @return bool
+        """
+        # Always accept response
+        if decision_type == WebKit2.PolicyDecisionType.RESPONSE:
+            decision.use()
+            return False
+
+        uri = decision.get_navigation_action().get_request().get_uri()
+        if decision.get_mouse_button() == 0:
+            decision.use()
+            return False
+        else:
+            El().window.container.add_web_view(uri, True)
+            decision.ignore()
+            return True

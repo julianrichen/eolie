@@ -46,12 +46,6 @@ class Window(Gtk.ApplicationWindow):
         if El().settings.get_value('window-maximized'):
             self.maximize()
 
-    def new_web_view(self, show):
-        """
-            Add a new web view, show it
-        """
-        self.__container.add_web_view("google.fr", show)
-
     @property
     def container(self):
         """
