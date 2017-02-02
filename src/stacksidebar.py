@@ -57,8 +57,8 @@ class SidebarChild(Gtk.ListBoxRow):
             @parma event as WebKit2.LoadEvent
         """
         if event == WebKit2.LoadEvent.STARTED:
-            self.__title.set_text(view.get_uri())
-            preview = El().art.get_artwork(view.get_uri(),
+            self.__title.set_text(view.loaded_uri)
+            preview = El().art.get_artwork(view.loaded_uri,
                                            "preview",
                                            view.get_scale_factor(),
                                            self.get_allocated_width() -
@@ -69,7 +69,7 @@ class SidebarChild(Gtk.ListBoxRow):
                 del preview
             else:
                 self.__image.clear()
-            favicon = El().art.get_artwork(view.get_uri(),
+            favicon = El().art.get_artwork(view.loaded_uri,
                                            "favicon",
                                            view.get_scale_factor(),
                                            ArtSize.FAVICON,
@@ -165,7 +165,7 @@ class SidebarChild(Gtk.ListBoxRow):
             self.__image_close.set_from_icon_name('web-browser-symbolic',
                                                   Gtk.IconSize.DIALOG)
             return
-        El().art.save_artwork(self.__view.get_uri(), surface, "favicon")
+        El().art.save_artwork(self.__view.loaded_uri, surface, "favicon")
         self.__image_close.set_from_surface(surface)
         del surface
         self.__image_close.get_style_context().remove_class('sidebar-close')
@@ -194,7 +194,7 @@ class SidebarChild(Gtk.ListBoxRow):
         self.__view.draw(context)
         self.__image.set_from_surface(surface)
         if save:
-            El().art.save_artwork(self.__view.get_uri(), surface, "preview")
+            El().art.save_artwork(self.__view.loaded_uri, surface, "preview")
         del surface
 
     def __on_notify_favicon(self, view, pointer):

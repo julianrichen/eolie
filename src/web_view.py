@@ -26,6 +26,7 @@ class WebView(WebKit2.WebView):
         """
         WebKit2.WebView.__init__(self)
         self.__scroll_timeout_id = None
+        self.__loaded_uri = ""
         settings = self.get_settings()
         settings.set_property("allow-file-access-from-file-urls",
                               False)
@@ -56,9 +57,18 @@ class WebView(WebKit2.WebView):
             Load uri
             @param uri as str
         """
+        self.__loaded_uri = uri
         if not uri.startswith("http://") and not uri.startswith("https://"):
             uri = "http://" + uri
         WebKit2.WebView.load_uri(self, uri)
+
+    @property
+    def loaded_uri(self):
+        """
+            Return loaded uri (This is not current uri!)
+            @return str
+        """
+        return self.__loaded_uri
 
 #######################
 # PRIVATE             #
