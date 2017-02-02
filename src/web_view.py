@@ -46,6 +46,7 @@ class WebView(WebKit2.WebView):
                               True)
         settings.set_property("media-playback-allows-inline", True)
         self.set_settings(settings)
+        self.set_zoom_level(1.2)
         self.show()
         self.connect('decide-policy', self.__on_decide_policy)
         self.connect('scroll-event', self.__on_scroll_event)
@@ -92,7 +93,7 @@ class WebView(WebKit2.WebView):
             return False
 
         uri = decision.get_navigation_action().get_request().get_uri()
-        if decision.get_mouse_button() == 0:
+        if decision.get_mouse_button() in [0, 1]:
             decision.use()
             return False
         else:
