@@ -1,4 +1,7 @@
 *~
+/python-webextension/*.o
+/python-webextension/*.so
+/python-webextension/*.py
 /eolie-cli
 /po
 /help

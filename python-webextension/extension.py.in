@@ -1,0 +1,66 @@
+# Copyright (c) 2014-2016 Cedric Bellegarde <cedric.bellegarde@adishatz.org>
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+# Make sure we'll find the pygobject module, even in JHBuild
+sys.path.insert(1, '@pyexecdir@')
+# Make sure we'll find the eolie modules, even in JHBuild
+sys.path.insert(1, '@pythondir@')
+
+from gi.repository import Gio
+
+from eolie.settings import Settings
+from eolie.database_adblock import DatabaseAdblock
+from eolie.sqlcursor import SqlCursor
+
+
+class Application(Gio.Application):
+    def new():
+        """
+            Return a new Settings object
+        """
+        app = Gio.Application.new(None, Gio.ApplicationFlags.IS_SERVICE)
+        app.__class__ = Application
+        app.cursors = {}
+        return app
+
+app = Application.new()
+settings = Settings.new()
+adblock = DatabaseAdblock()
+
+
+def on_send_request(webpage, request, redirect):
+    """
+        Filter based on adblock db
+        @param webpage as WebKit2WebExtension.WebPage
+        @param request as WebKitURIRequest
+        @param redirect as WebKit2WebExtension.URIResponse
+    """
+    uri = request.get_uri()
+    if settings.get_value('adblock') and adblock.is_blocked(uri):
+        return True
+    
+def on_page_created(extension, webpage):
+    """
+        Connect to send request
+        @param extension as WebKit2WebExtension
+        @param webpage as WebKit2WebExtension.WebPage
+    """
+    webpage.connect("send-request", on_send_request)
+
+
+def initialize(extension, arguments):
+    """
+        Connect to page created
+        @param extension as WebKit2WebExtension
+    """
+    extension.connect("page-created", on_page_created)
