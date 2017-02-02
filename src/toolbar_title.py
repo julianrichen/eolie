@@ -149,7 +149,7 @@ class ToolbarTitle(Gtk.Bin):
         elif event.keyval == Gdk.KEY_Return and entry.get_text() == self.__uri:
             self.__popover.send_event_to_history(event)
             return True
-        elif event.keyval == Gdk.KEY_Return:
+        elif event.keyval in [Gdk.KEY_Return, Gdk.KEY_Escape]:
             GLib.idle_add(self.hide_popover)
 
     def _on_reload_press(self, eventbox, event):
