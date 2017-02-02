@@ -54,7 +54,6 @@
                       <object class="GtkListBox" id="bookmarks_box">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <signal name="row-activated" handler="_on_row_activated" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -121,7 +120,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <signal name="map" handler="_on_history_map" swapped="no"/>
-                    <signal name="row-activated" handler="_on_row_activated" swapped="no"/>
                     <signal name="unmap" handler="_on_history_unmap" swapped="no"/>
                   </object>
                 </child>

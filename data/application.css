@@ -3,28 +3,6 @@
     text-shadow: none;
 }
 
-treeview {
-    padding: 2px 2px 2px 2px;
-}
-
-treeview:selected:hover {
-        background-color: shade(@theme_selected_bg_color, 0.9);
-        color: @theme_selected_fg_color;
-}
-
-treeview:hover {
-    background-color: alpha(@theme_fg_color, 0.05);
-    color: @theme_fg_color;
-}
-
-treeview.separator {
-    color: alpha(@theme_fg_color, 0.1);
-}
-
-treeview .image:selected{
-    color: @theme_selected_fg_color;
-}
-
 .progressbar progress {
     background-color: @theme_selected_bg_color;
     background-image: none;

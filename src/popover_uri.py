@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, Gdk, GObject, Gio, Pango
+from gi.repository import Gtk, Gdk, GLib, GObject, Gio, Pango
 
 from gettext import gettext as _
 
@@ -66,7 +66,11 @@ class Row(Gtk.ListBoxRow):
         grid.add(uri)
         grid.show_all()
         self.set_size_request(-1, 30)
-        self.add(grid)
+        eventbox = Gtk.EventBox()
+        eventbox.add(grid)
+        eventbox.show()
+        eventbox.connect('button-press-event', self.__on_button_press)
+        self.add(eventbox)
 
     @property
     def item(self):
@@ -75,6 +79,28 @@ class Row(Gtk.ListBoxRow):
             @return Item
         """
         return self.__item
+
+#######################
+# PRIVATE             #
+#######################
+    def __handle_event(self, event):
+        """
+            Handle event (button press)
+        """
+        uri = self.item.get_property("uri")
+        if event.button == 1:
+            El().window.container.current.load_uri(uri)
+        else:
+            El().window.container.add_web_view(uri, True)
+
+    def __on_button_press(self, eventbox, event):
+        """
+            Got to uri
+            @param eventbox as Gtk.EventBox
+            @param event as Gdk.Event
+        """
+        El().window.toolbar.title.hide_popover()
+        GLib.idle_add(self.__handle_event, event)
 
 
 class UriPopover(Gtk.Popover):
@@ -212,15 +238,6 @@ class UriPopover(Gtk.Popover):
             @param widget as Gtk.Widget
         """
         pass
-
-    def _on_row_activated(self, listbox, row):
-        """
-            Got to uri
-            @param listbox as Gtk.ListBox
-            @param row as Row
-        """
-        El().window.container.current.load_uri(row.item.get_property("uri"))
-        self.hide()
 
 #######################
 # PRIVATE             #

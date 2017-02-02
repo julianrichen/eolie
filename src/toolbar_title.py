@@ -70,6 +70,8 @@ class ToolbarTitle(Gtk.Bin):
         """
             hide popover if needed
         """
+        self.__lock = False
+        self.__in_notify = False
         if self.__popover.is_visible():
             self.__popover.hide()
             El().window.set_focus(None)
