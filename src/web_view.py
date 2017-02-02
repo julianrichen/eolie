@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import WebKit2
+from gi.repository import WebKit2, GLib
 
 from eolie.define import El
 
@@ -25,6 +25,7 @@ class WebView(WebKit2.WebView):
             Init view
         """
         WebKit2.WebView.__init__(self)
+        self.__scroll_timeout_id = None
         settings = self.get_settings()
         settings.set_property("allow-file-access-from-file-urls",
                               False)
@@ -47,6 +48,7 @@ class WebView(WebKit2.WebView):
         self.set_settings(settings)
         self.show()
         self.connect('decide-policy', self.__on_decide_policy)
+        self.connect('scroll-event', self.__on_scroll_event)
 
     def load_uri(self, uri):
         """
@@ -60,6 +62,22 @@ class WebView(WebKit2.WebView):
 #######################
 # PRIVATE             #
 #######################
+    def __update_snapshot(self):
+        """
+            Update snapshot
+        """
+        self.__scroll_timeout_id = None
+        El().window.container.sidebar.update_preview(self)
+
+    def __on_scroll_event(self, view, event):
+        """
+            Update snapshot
+        """
+        if self.__scroll_timeout_id is not None:
+            GLib.source_remove(self.__scroll_timeout_id)
+        self.__scroll_timeout_id = GLib.timeout_add(1000,
+                                                    self.__update_snapshot)
+
     def __on_decide_policy(self, view, decision, decision_type):
         """
             Navigation policy

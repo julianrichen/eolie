@@ -90,6 +90,14 @@ class Container(Gtk.Paned):
             self.current.load_uri(uri)
 
     @property
+    def sidebar(self):
+        """
+            Get sidebar
+            @return StackSidebar
+        """
+        return self.__stack_sidebar
+
+    @property
     def current(self):
         """
             Current view

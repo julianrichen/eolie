@@ -84,9 +84,21 @@ class SidebarChild(Gtk.ListBoxRow):
             title = view.get_title()
             if title is not None:
                 self.__title.set_text(title)
-            GLib.timeout_add(500, self.__set_preview)
+            GLib.timeout_add(500, self.set_preview, True)
             if view.get_favicon() is not None:
                 GLib.timeout_add(500, self.__set_favicon)
+
+    def set_preview(self, save):
+        """
+            Set webpage preview
+            @param save as bool
+        """
+        self.__view.get_snapshot(
+                                WebKit2.SnapshotRegion.FULL_DOCUMENT,
+                                WebKit2.SnapshotOptions.NONE,
+                                None,
+                                self.__on_snapshot,
+                                save)
 
 #######################
 # PROTECTED           #
@@ -159,21 +171,12 @@ class SidebarChild(Gtk.ListBoxRow):
         self.__image_close.get_style_context().remove_class('sidebar-close')
         self.__image_close.show()
 
-    def __set_preview(self):
-        """
-            Set webpage preview
-        """
-        self.__view.get_snapshot(
-                                WebKit2.SnapshotRegion.FULL_DOCUMENT,
-                                WebKit2.SnapshotOptions.NONE,
-                                None,
-                                self.__on_snapshot)
-
-    def __on_snapshot(self, view, result):
+    def __on_snapshot(self, view, result, save):
         """
             Set snapshot on main image
             @param view as WebView
             @param result as Gio.AsyncResult
+            @param save as bool
         """
         try:
             snapshot = self.__view.get_snapshot_finish(result)
@@ -190,7 +193,8 @@ class SidebarChild(Gtk.ListBoxRow):
         context.scale(factor, factor)
         self.__view.draw(context)
         self.__image.set_from_surface(surface)
-        El().art.save_artwork(self.__view.get_uri(), surface, "preview")
+        if save:
+            El().art.save_artwork(self.__view.get_uri(), surface, "preview")
         del surface
 
     def __on_notify_favicon(self, view, pointer):
@@ -250,6 +254,16 @@ class StackSidebar(Gtk.Grid):
                 child.get_style_context().add_class('sidebar-item-selected')
             else:
                 child.get_style_context().remove_class('sidebar-item-selected')
+
+    def update_preview(self, view):
+        """
+            Update preview for view
+            @param view as WebView
+        """
+        for child in self.__listbox.get_children():
+            if child.view == view:
+                child.set_preview(False)
+                break
 
     def on_load_changed(self, view, event):
         """
