@@ -103,10 +103,15 @@ class WebView(WebKit2.WebView):
             return False
 
         uri = decision.get_navigation_action().get_request().get_uri()
-        if decision.get_mouse_button() in [0, 1]:
+        if decision.get_mouse_button() == 0:
+            decision.use()
+            return False
+        elif decision.get_mouse_button() == 1:
+            self.__loaded_uri = uri
             decision.use()
             return False
         else:
+            self.__loaded_uri = uri
             El().window.container.add_web_view(uri, True)
             decision.ignore()
             return True
