@@ -112,7 +112,7 @@
           <packing>
             <property name="name">search</property>
             <property name="title" translatable="yes">Search</property>
-            <property name="icon_name">document-open-recent-symbolic</property>
+            <property name="icon_name">edit-find-symbolic</property>
             <property name="position">1</property>
           </packing>
         </child>
