@@ -111,7 +111,6 @@ class WebView(WebKit2.WebView):
             decision.use()
             return False
         else:
-            self.__loaded_uri = uri
             El().window.container.add_web_view(uri, True)
             decision.ignore()
             return True
