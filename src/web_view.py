@@ -46,7 +46,6 @@ class WebView(WebKit2.WebView):
                               True)
         settings.set_property("media-playback-allows-inline", True)
         self.set_settings(settings)
-        self.set_zoom_level(1.2)
         self.show()
         self.connect('decide-policy', self.__on_decide_policy)
 
