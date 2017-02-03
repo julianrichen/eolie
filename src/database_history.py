@@ -98,7 +98,7 @@ class DatabaseHistory:
                                   FROM history\
                                   WHERE title LIKE ?\
                                    OR uri LIKE ?\
-                                  ORDER BY mtime DESC",
+                                  ORDER BY mtime DESC LIMIT 50",
                                  (filter, filter))
             return list(result)
 
