@@ -28,6 +28,7 @@ class SidebarChild(Gtk.ListBoxRow):
             @param stack as Gtk.Stack
         """
         Gtk.ListBoxRow.__init__(self)
+        self.__scroll_timeout_id = None
         self.__view = view
         self.__stack = stack
         self.__offscreen = False
@@ -43,6 +44,9 @@ class SidebarChild(Gtk.ListBoxRow):
         self.__title.set_label("Empty page")
         self.add(builder.get_object('widget'))
         view.connect("notify::favicon", self.__on_notify_favicon)
+        view.connect('scroll-event', self.__on_scroll_event)
+        view.connect("notify::uri", self.__on_uri_changed)
+        view.connect("notify::title", self.__on_title_changed)
         self.get_style_context().add_class('sidebar-item')
 
     @property
@@ -52,65 +56,6 @@ class SidebarChild(Gtk.ListBoxRow):
             @return WebView
         """
         return self.__view
-
-    def on_load_changed(self, view, event):
-        """
-            Update label/favicon
-            @param view as WebView
-            @parma event as WebKit2.LoadEvent
-        """
-        if event == WebKit2.LoadEvent.STARTED:
-            self.__title.set_text(view.loaded_uri)
-            preview = El().art.get_artwork(view.loaded_uri,
-                                           "preview",
-                                           view.get_scale_factor(),
-                                           self.get_allocated_width() -
-                                           ArtSize.PREVIEW_WIDTH_MARGIN,
-                                           ArtSize.PREVIEW_HEIGHT)
-            if preview is not None:
-                self.__image.set_from_surface(preview)
-                del preview
-            else:
-                self.__image.clear()
-            favicon = El().art.get_artwork(view.loaded_uri,
-                                           "favicon",
-                                           view.get_scale_factor(),
-                                           ArtSize.FAVICON,
-                                           ArtSize.FAVICON)
-            if favicon is not None:
-                self.__image_close.set_from_surface(favicon)
-                del favicon
-            else:
-                self.__image_close.set_from_icon_name('web-browser-symbolic',
-                                                      Gtk.IconSize.DIALOG)
-        elif event == WebKit2.LoadEvent.FINISHED:
-            title = view.get_title()
-            if title is not None:
-                self.__title.set_text(title)
-            GLib.timeout_add(500, self.set_preview, True)
-            if view.get_favicon() is not None:
-                GLib.timeout_add(500, self.__set_favicon)
-
-    def set_preview(self, save):
-        """
-            Set webpage preview
-            @param save as bool
-        """
-        if self.__view == El().window.container.current:
-            self.__view.get_snapshot(
-                                    WebKit2.SnapshotRegion.VISIBLE,
-                                    WebKit2.SnapshotOptions.NONE,
-                                    None,
-                                    self.__on_snapshot,
-                                    save)
-        else:
-            self.set_offscreen(True)
-            self.__view.get_snapshot(
-                                    WebKit2.SnapshotRegion.VISIBLE,
-                                    WebKit2.SnapshotOptions.NONE,
-                                    None,
-                                    self.__on_snapshot,
-                                    save)
 
     def set_offscreen(self, offscreen):
         """
@@ -169,6 +114,92 @@ class SidebarChild(Gtk.ListBoxRow):
 #######################
 # PRIVATE             #
 #######################
+    def __get_snapshot(self, save):
+        """
+            Set webpage preview
+            @param save as bool
+        """
+        if self.__view == El().window.container.current:
+            self.__view.get_snapshot(
+                                    WebKit2.SnapshotRegion.VISIBLE,
+                                    WebKit2.SnapshotOptions.NONE,
+                                    None,
+                                    self.__on_snapshot,
+                                    save)
+        else:
+            self.set_offscreen(True)
+            self.__view.get_snapshot(
+                                    WebKit2.SnapshotRegion.VISIBLE,
+                                    WebKit2.SnapshotOptions.NONE,
+                                    None,
+                                    self.__on_snapshot,
+                                    save)
+
+    def __get_snapshot_timeout(self):
+        """
+            Get snapshot timeout
+        """
+        self.__scroll_timeout_id = None
+        self.__get_snapshot()
+
+    def __on_uri_changed(self, view, uri):
+        """
+            Update uri
+            @param view as WebView
+            @param uri as str
+        """
+        self.__title.set_text(view.get_uri())
+        preview = El().art.get_artwork(view.get_uri(),
+                                       "preview",
+                                       view.get_scale_factor(),
+                                       self.get_allocated_width() -
+                                       ArtSize.PREVIEW_WIDTH_MARGIN,
+                                       ArtSize.PREVIEW_HEIGHT)
+        if preview is not None:
+            self.__image.set_from_surface(preview)
+            del preview
+        else:
+            self.__image.clear()
+        favicon = El().art.get_artwork(view.get_uri(),
+                                       "favicon",
+                                       view.get_scale_factor(),
+                                       ArtSize.FAVICON,
+                                       ArtSize.FAVICON)
+        if favicon is not None:
+            self.__image_close.set_from_surface(favicon)
+            del favicon
+        else:
+            self.__image_close.set_from_icon_name('web-browser-symbolic',
+                                                  Gtk.IconSize.DIALOG)
+
+    def __on_title_changed(self, view, event):
+        """
+            Update title
+            @param view as WebView
+            @param title as str
+        """
+        if event.name != "title":
+            return
+        title = view.get_title()
+        if not title:
+            title = view.get_uri()
+        self.__title.set_text(title)
+        GLib.timeout_add(500, self.__get_snapshot, True)
+        if view.get_favicon() is not None:
+            GLib.timeout_add(500, self.__set_favicon)
+
+    def __on_scroll_event(self, view, event):
+        """
+            Update snapshot
+            @param view as WebView
+            @param event as WebKit2.Event
+        """
+        if self.__scroll_timeout_id is not None:
+            GLib.source_remove(self.__scroll_timeout_id)
+        self.__scroll_timeout_id = GLib.timeout_add(
+                                                1000,
+                                                self.__get_snapshot_timeout)
+
     def __get_favicon(self, surface):
         """
             Resize surface to match favicon size
@@ -197,6 +228,7 @@ class SidebarChild(Gtk.ListBoxRow):
             self.__image_close.set_from_icon_name('web-browser-symbolic',
                                                   Gtk.IconSize.DIALOG)
             return
+        El().art.save_artwork(self.__view.get_uri(), surface, "favicon")
         El().art.save_artwork(self.__view.loaded_uri, surface, "favicon")
         self.__image_close.set_from_surface(surface)
         del surface
@@ -227,6 +259,7 @@ class SidebarChild(Gtk.ListBoxRow):
         context.paint()
         self.__image.set_from_surface(surface)
         if save:
+            El().art.save_artwork(self.__view.get_uri(), surface, "preview")
             El().art.save_artwork(self.__view.loaded_uri, surface, "preview")
         del surface
         self.set_offscreen(False)
@@ -288,27 +321,6 @@ class StackSidebar(Gtk.Grid):
                 child.get_style_context().add_class('sidebar-item-selected')
             else:
                 child.get_style_context().remove_class('sidebar-item-selected')
-
-    def update_preview(self, view):
-        """
-            Update preview for view
-            @param view as WebView
-        """
-        for child in self.__listbox.get_children():
-            if child.view == view:
-                child.set_preview(False)
-                break
-
-    def on_load_changed(self, view, event):
-        """
-            Update child linked to view
-            @param view as WebView
-            @parma event as WebKit2.LoadEvent
-        """
-        for child in self.__listbox.get_children():
-            if child.view == view:
-                child.on_load_changed(view, event)
-                break
 
 #######################
 # PRIVATE             #

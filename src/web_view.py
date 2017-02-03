@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import WebKit2, GLib
+from gi.repository import WebKit2
 
 from eolie.define import El
 
@@ -25,7 +25,6 @@ class WebView(WebKit2.WebView):
             Init view
         """
         WebKit2.WebView.__init__(self)
-        self.__scroll_timeout_id = None
         self.__loaded_uri = ""
         settings = self.get_settings()
         settings.set_property("allow-file-access-from-file-urls",
@@ -50,9 +49,6 @@ class WebView(WebKit2.WebView):
         self.set_zoom_level(1.2)
         self.show()
         self.connect('decide-policy', self.__on_decide_policy)
-        self.connect('scroll-event', self.__on_scroll_event)
-        self.connect('enter-fullscreen', self.__on_enter_fullscreen)
-        self.connect('leave-fullscreen', self.__on_leave_fullscreen)
 
     def load_uri(self, uri):
         """
@@ -75,22 +71,6 @@ class WebView(WebKit2.WebView):
 #######################
 # PRIVATE             #
 #######################
-    def __update_snapshot(self):
-        """
-            Update snapshot
-        """
-        self.__scroll_timeout_id = None
-        El().window.container.sidebar.update_preview(self)
-
-    def __on_scroll_event(self, view, event):
-        """
-            Update snapshot
-        """
-        if self.__scroll_timeout_id is not None:
-            GLib.source_remove(self.__scroll_timeout_id)
-        self.__scroll_timeout_id = GLib.timeout_add(1000,
-                                                    self.__update_snapshot)
-
     def __on_decide_policy(self, view, decision, decision_type):
         """
             Navigation policy
@@ -116,15 +96,3 @@ class WebView(WebKit2.WebView):
             El().window.container.add_web_view(uri, True)
             decision.ignore()
             return True
-
-    def __on_enter_fullscreen(self, view):
-        """
-            Hide sidebar (conflict with fs)
-        """
-        El().window.container.sidebar.hide()
-
-    def __on_leave_fullscreen(self, view):
-        """
-            Show sidebar (conflict with fs)
-        """
-        El().window.container.sidebar.show()

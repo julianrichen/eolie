@@ -59,8 +59,13 @@ class Container(Gtk.Paned):
         view.connect('map', self.__on_view_map)
         view.connect('notify::estimated-load-progress',
                      self.__on_estimated_load_progress)
-        view.connect('button-press-event', self.__on_button_press)
         view.connect('load-changed', self.__on_load_changed)
+        view.connect('button-press-event', self.__on_button_press)
+        view.connect("notify::uri", self.__on_uri_changed)
+        view.connect("notify::title", self.__on_title_changed)
+        view.connect('enter-fullscreen', self.__on_enter_fullscreen)
+        view.connect('leave-fullscreen', self.__on_leave_fullscreen)
+
         if uri != "about:blank":
             view.load_uri(uri)
         view.show()
@@ -68,7 +73,6 @@ class Container(Gtk.Paned):
         if show:
             self.__stack.add(view)
             self.__stack.set_visible_child(view)
-            El().window.toolbar.title.set_uri(uri)
             self.__stack_sidebar.update_visible_child()
 
     def load_uri(self, uri):
@@ -127,22 +131,52 @@ class Container(Gtk.Paned):
         value = view.get_estimated_load_progress()
         self.__progress.set_fraction(value)
 
+    def __on_uri_changed(self, view, uri):
+        """
+            Update uri
+            @param view as WebView
+            @param uri as str
+        """
+        if view == self.current:
+            El().window.toolbar.title.set_uri(view.get_uri())
+
+    def __on_title_changed(self, view, event):
+        """
+            Update title
+            @param view as WebView
+            @param title as str
+        """
+        if event.name != "title":
+            return
+        uri = view.get_uri()
+        title = view.get_title()
+        if view == self.current:
+            if title:
+                El().window.toolbar.title.set_title(title)
+            else:
+                El().window.toolbar.title.set_title(uri)
+            El().window.toolbar.actions.set_actions(view)
+        El().history.add(title, uri)
+
+    def __on_enter_fullscreen(self, view):
+        """
+            Hide sidebar (conflict with fs)
+        """
+        self.__stack_sidebar.hide()
+
+    def __on_leave_fullscreen(self, view):
+        """
+            Show sidebar (conflict with fs)
+        """
+        self.__stack_sidebar.show()
+
     def __on_load_changed(self, view, event):
         """
             Update sidebar/urlbar
             @param view as WebView
             @param event as WebKit2.LoadEvent
         """
-        self.__stack_sidebar.on_load_changed(view, event)
-        if view == self.current:
-            El().window.toolbar.title.set_uri(view.get_uri())
         if event == WebKit2.LoadEvent.STARTED:
             self.__progress.show()
         if event == WebKit2.LoadEvent.FINISHED:
             self.__progress.hide()
-            El().history.add(view.get_title(), view.get_uri())
-            if view.get_uri() != view.loaded_uri:
-                El().history.add(view.get_title(), view.loaded_uri)
-            if view == self.current:
-                El().window.toolbar.actions.set_actions(view)
-                El().window.toolbar.title.set_title(view.get_title())
