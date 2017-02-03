@@ -24,4 +24,5 @@ class ArtSize:
 class BookmarksType:
     POPULARS = -1
     RECENTS = -2
-    SEPARATOR = -3
+    URI = -3
+    SEPARATOR = -4
