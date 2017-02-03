@@ -120,13 +120,15 @@ class SidebarChild(Gtk.ListBoxRow):
         if self.__offscreen and not offscreen:
             window = self.__view.get_toplevel()
             window.remove(self.__view)
+            self.__view.set_size_request(-1, -1)
             self.__stack.add(self.__view)
             self.__offscreen = False
         elif offscreen and not self.__offscreen:
             self.__offscreen = True
             self.__stack.remove(self.__view)
             window = Gtk.OffscreenWindow.new()
-            window.set_size_request(800, 800)
+            self.__view.set_size_request(self.__stack.get_allocated_width(),
+                                         self.__stack.get_allocated_height())
             window.add(self.__view)
             window.show()
 

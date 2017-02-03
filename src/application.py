@@ -123,7 +123,6 @@ class Application(Gtk.Application):
                 self.window.setup_menu(menu)
             self.window.show()
             self.window.container.add_web_view("google.fr", True)
-            self.window.container.add_web_view("linux.org", False)
 
     def prepare_to_exit(self, action=None, param=None, exit=True):
         """
