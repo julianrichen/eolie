@@ -70,16 +70,6 @@ class Container(Gtk.Paned):
             self.__stack.set_visible_child(view)
             El().window.toolbar.title.set_uri(uri)
             self.__stack_sidebar.update_visible_child()
-        else:
-            print("#FIXME")
-            window = Gtk.OffscreenWindow.new()
-            scrolled = Gtk.ScrolledWindow()
-            scrolled.set_hexpand(True)
-            scrolled.set_vexpand(True)
-            scrolled.add(view)
-            scrolled.set_size_request(1000, 1000)
-            window.add(scrolled)
-            window.show_all()
 
     def load_uri(self, uri):
         """
