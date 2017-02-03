@@ -140,7 +140,7 @@ class SidebarChild(Gtk.ListBoxRow):
             Get snapshot timeout
         """
         self.__scroll_timeout_id = None
-        self.__get_snapshot()
+        self.__get_snapshot(False)
 
     def __on_uri_changed(self, view, uri):
         """
