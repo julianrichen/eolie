@@ -51,6 +51,8 @@ class WebView(WebKit2.WebView):
         self.show()
         self.connect('decide-policy', self.__on_decide_policy)
         self.connect('scroll-event', self.__on_scroll_event)
+        self.connect('enter-fullscreen', self.__on_enter_fullscreen)
+        self.connect('leave-fullscreen', self.__on_leave_fullscreen)
 
     def load_uri(self, uri):
         """
@@ -114,3 +116,15 @@ class WebView(WebKit2.WebView):
             El().window.container.add_web_view(uri, True)
             decision.ignore()
             return True
+
+    def __on_enter_fullscreen(self, view):
+        """
+            Hide sidebar (conflict with fs)
+        """
+        El().window.container.sidebar.hide()
+
+    def __on_leave_fullscreen(self, view):
+        """
+            Show sidebar (conflict with fs)
+        """
+        El().window.container.sidebar.show()
