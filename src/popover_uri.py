@@ -213,6 +213,9 @@ class UriPopover(Gtk.Popover):
                 item.set_property("id", tag_id)
                 item.set_property("title", title)
                 self.__tags_model.append(item)
+        if self.__tags_box.get_children():
+            self.__tags_box.select_row(self.__tags_box.get_children()[0])
+            self.__set_bookmarks(BookmarksType.POPULARS)
 
     def _on_history_unmap(self, widget):
         """
