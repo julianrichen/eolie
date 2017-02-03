@@ -88,6 +88,13 @@ class Application(Gtk.Application):
         self.bookmarks = DatabaseBookmarks()
         self.bookmarks.import_firefox()
         self.art = Art()
+
+        shortcut_action = Gio.SimpleAction.new('shortcut',
+                                               GLib.VariantType.new('s'))
+        shortcut_action.connect('activate', self.__on_shortcut_action)
+        self.add_action(shortcut_action)
+        self.set_accels_for_action("app.shortcut::uri", ["<Control>l"])
+
         # Set some WebKit defaults
         context = WebKit2.WebContext.get_default()
         data_manager = WebKit2.WebsiteDataManager()
@@ -140,13 +147,6 @@ class Application(Gtk.Application):
 #######################
 # PRIVATE             #
 #######################
-    def __on_activate(self, application):
-        """
-            Call default handler
-            @param application as Gio.Application
-        """
-        self.window.present()
-
     def __settings_dialog(self, action=None, param=None):
         """
             Show settings dialog
@@ -227,3 +227,20 @@ class Application(Gtk.Application):
         self.add_action(quitAction)
 
         return menu
+
+    def __on_activate(self, application):
+        """
+            Call default handler
+            @param application as Gio.Application
+        """
+        self.window.present()
+
+    def __on_shortcut_action(self, action, param):
+        """
+            Global shortcuts handler
+            @param action as Gio.SimpleAction
+            @param param as GLib.Variant
+        """
+        string = param.get_string()
+        if string == "uri":
+            self.window.toolbar.title.focus_entry()

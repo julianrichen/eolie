@@ -76,6 +76,12 @@ class ToolbarTitle(Gtk.Bin):
             self.__popover.hide()
             El().window.set_focus(None)
 
+    def focus_entry(self):
+        """
+            Focus entry
+        """
+        self.get_toplevel().set_focus(self.__entry)
+
 #######################
 # PROTECTED           #
 #######################
