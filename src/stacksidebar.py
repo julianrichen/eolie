@@ -94,7 +94,7 @@ class SidebarChild(Gtk.ListBoxRow):
             @param save as bool
         """
         self.__view.get_snapshot(
-                                WebKit2.SnapshotRegion.FULL_DOCUMENT,
+                                WebKit2.SnapshotRegion.VISIBLE,
                                 WebKit2.SnapshotOptions.NONE,
                                 None,
                                 self.__on_snapshot,
@@ -182,16 +182,16 @@ class SidebarChild(Gtk.ListBoxRow):
             snapshot = self.__view.get_snapshot_finish(result)
         except:
             return
+        factor = self.get_allocated_width() /\
+            snapshot.get_width()
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                      self.get_allocated_width() -
                                      ArtSize.PREVIEW_WIDTH_MARGIN,
                                      ArtSize.PREVIEW_HEIGHT)
         context = cairo.Context(surface)
-        context.set_source_surface(snapshot)
-        factor = self.get_allocated_width() /\
-            snapshot.get_width()
         context.scale(factor, factor)
-        self.__view.draw(context)
+        context.set_source_surface(snapshot, 0, 0)
+        context.paint()
         self.__image.set_from_surface(surface)
         if save:
             El().art.save_artwork(self.__view.loaded_uri, surface, "preview")
