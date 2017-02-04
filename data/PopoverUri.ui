@@ -28,7 +28,6 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <signal name="map" handler="_on_bookmarks_map" swapped="no"/>
-            <signal name="unmap" handler="_on_bookmarks_unmap" swapped="no"/>
             <child>
               <object class="GtkScrolledWindow" id="scrolled_bookmarks">
                 <property name="visible">True</property>
@@ -102,7 +101,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <signal name="map" handler="_on_history_map" swapped="no"/>
-                    <signal name="unmap" handler="_on_history_unmap" swapped="no"/>
                   </object>
                 </child>
               </object>

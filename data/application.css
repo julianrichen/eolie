@@ -46,6 +46,10 @@
     padding-right: 28px;
 }
 
+.input {
+    background-color: alpha(@theme_selected_bg_color, 0.1);
+}
+
 .uribar-title {
     background-color: transparent;
     background-image: none;

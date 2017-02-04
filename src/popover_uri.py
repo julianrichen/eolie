@@ -38,19 +38,12 @@ class Row(Gtk.ListBoxRow):
             Init row
             @param item as Item
         """
+        self.__item = item
         self.__eventbox = None
         Gtk.ListBoxRow.__init__(self)
         item_id = item.get_property("id")
-
-        if item_id == BookmarksType.SEPARATOR:
-            separator = Gtk.Separator()
-            separator.show()
-            self.add(separator)
-            return
-
         uri = item.get_property("uri")
         title = item.get_property("title")
-        self.__item = item
         grid = Gtk.Grid()
         grid.set_column_spacing(10)
         grid.set_hexpand(True)
@@ -117,6 +110,13 @@ class Row(Gtk.ListBoxRow):
 #######################
 
 
+class Input:
+    NONE = 0
+    HISTORY = 1
+    TAGS = 2
+    BOOKMARKS = 3
+
+
 class UriPopover(Gtk.Popover):
     """
         Show user bookmarks or history
@@ -127,6 +127,7 @@ class UriPopover(Gtk.Popover):
             Init popover
         """
         Gtk.Popover.__init__(self)
+        self.__input = False
         self.set_modal(False)
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/PopoverUri.ui')
@@ -150,6 +151,14 @@ class UriPopover(Gtk.Popover):
         self.add(builder.get_object('widget'))
         self.connect('map', self.__on_map)
 
+    @property
+    def input(self):
+        """
+            Get input type
+            @return Input
+        """
+        return self.__input
+
     def set_history_text(self, search):
         """
             Set history model
@@ -159,33 +168,97 @@ class UriPopover(Gtk.Popover):
         self.__stack.set_visible_child_name("search")
         self.__set_history_text(search)
 
-    def send_event_to_history(self, event):
+    def forward_event(self, event):
         """
-            Forward event to history box
-            @param event as Gdk.Eventg
+            Forward event, smart navigation between boxes
+            @param event as Gdk.Event
+            @return True if event forwarded
         """
-        rows = self.__history_box.get_children()
-        if not rows:
-            return
-        selected = self.__history_box.get_selected_row()
-        if event.keyval in [Gdk.KEY_Down, Gdk.KEY_Up]:
+        if not self.is_visible():
+            return False
+        if event.keyval == Gdk.KEY_Up and self.__input == Input.NONE:
+            return False
+        if event.keyval == Gdk.KEY_Left and self.__input == Input.BOOKMARKS:
+            self.__input = Input.TAGS
+            self.__tags_box.get_style_context().add_class('input')
+            self.__bookmarks_box.get_style_context().remove_class('input')
+            return True
+        elif event.keyval == Gdk.KEY_Right and self.__input == Input.TAGS:
+            self.__input = Input.BOOKMARKS
+            self.__bookmarks_box.get_style_context().add_class('input')
+            self.__tags_box.get_style_context().remove_class('input')
+            return True
+        elif event.keyval in [Gdk.KEY_Down, Gdk.KEY_Up]:
+            # If nothing selected, detect default widget
+            if self.__input == Input.NONE:
+                if self.__stack.get_visible_child_name() == "history":
+                    self.__input = Input.HISTORY
+                    self.__history_box.get_style_context().add_class('input')
+                elif self.__stack.get_visible_child_name() == "bookmarks":
+                    self.__tags_box.get_style_context().add_class('input')
+                    self.__input = Input.TAGS
+                else:
+                    self.__input = Input.NONE
+                box = self.__get_current_box()
+                if box is not None:
+                    rows = box.get_children()
+                    if rows:
+                        box.select_row(rows[0])
+                return True
+            box = self.__get_current_box()
+            rows = box.get_children()
+            if box is None or not rows:
+                self.__input = Input.NONE
+                return False
+            selected = box.get_selected_row()
             # If nothing selected, select first row
             if selected is None:
-                self.__history_box.select_row(rows[0])
+                box.select_row(rows[0])
+                if self.__input == Input.TAGS:
+                    item_id = rows[0].item.get_property("id")
+                    self.__set_bookmarks(item_id)
             else:
                 idx = -1 if event.keyval == Gdk.KEY_Up else 1
                 for row in rows:
                     if row == selected:
                         break
                     idx += 1
-                if idx < 0:
-                    self.__history_box.select_row(rows[-1])
-                elif idx >= len(rows):
-                    self.__history_box.select_row(rows[0])
+                if idx >= len(rows):
+                    box.select_row(rows[0])
+                    if self.__input == Input.TAGS:
+                        item_id = rows[0].item.get_property("id")
+                        self.__set_bookmarks(item_id)
+                    return True
+                elif idx < 0:
+                    # Do not go to uribar for bookmarks list
+                    if self.__input in [Input.BOOKMARKS, Input.HISTORY]:
+                        box.select_row(rows[-1])
+                        return True
+                    else:
+                        box.select_row(None)
+                        self.__input = Input.NONE
+                        box.get_style_context().remove_class('input')
+                        return False
                 else:
-                    self.__history_box.select_row(rows[idx])
-        elif event.keyval == Gdk.KEY_Return and selected is not None:
-            selected.emit("activate")
+                    box.select_row(rows[idx])
+                    if self.__input == Input.TAGS:
+                        item_id = rows[idx].item.get_property("id")
+                        self.__set_bookmarks(item_id)
+                    return True
+        elif event.keyval == Gdk.KEY_Return:
+            box = self.__get_current_box()
+            if box is not None:
+                selected = box.get_selected_row()
+                if selected is not None:
+                    selected.emit("activate")
+                return True
+            else:
+                self.__input = Input.NONE
+                box.get_style_context().remove_class('input')
+                return False
+        else:
+            self.__input = Input.NONE
+            return False
 
 #######################
 # PROTECTED           #
@@ -195,6 +268,7 @@ class UriPopover(Gtk.Popover):
             Init history
             @param widget as Gtk.Widget
         """
+        self.__input == Input.HISTORY
         self.set_history_text("")
 
     def _on_bookmarks_map(self, widget):
@@ -202,12 +276,12 @@ class UriPopover(Gtk.Popover):
             Init bookmarks
             @param widget as Gtk.Widget
         """
+        self.__input == Input.TAGS
         if not self.__tags_box.get_children():
             static = [(BookmarksType.POPULARS,
                        _("Populars")),
                       (BookmarksType.RECENTS,
-                       _("Recents")),
-                      (BookmarksType.SEPARATOR, "")]
+                       _("Recents"))]
             for (tag_id, title) in static + El().bookmarks.get_tags():
                 item = Item()
                 item.set_property("id", tag_id)
@@ -217,23 +291,23 @@ class UriPopover(Gtk.Popover):
             self.__tags_box.select_row(self.__tags_box.get_children()[0])
             self.__set_bookmarks(BookmarksType.POPULARS)
 
-    def _on_history_unmap(self, widget):
-        """
-            Clear history
-            @param widget as Gtk.Widget
-        """
-        pass
-
-    def _on_bookmarks_unmap(self, widget):
-        """
-            Clear bookmarks
-            @param widget as Gtk.Widget
-        """
-        pass
-
 #######################
 # PRIVATE             #
 #######################
+    def __get_current_box(self):
+        """
+            Get current box
+            @return Gtk.ListBox
+        """
+        box = None
+        if self.__input == Input.HISTORY:
+            box = self.__history_box
+        elif self.__input == Input.TAGS:
+            box = self.__tags_box
+        elif self.__input == Input.BOOKMARKS:
+            box = self.__bookmarks_box
+        return box
+
     def __set_history_text(self, search):
         """
             Set history model
@@ -297,6 +371,10 @@ class UriPopover(Gtk.Popover):
             Resize
             @param widget as Gtk.Widget
         """
+        self.__input = Input.NONE
+        self.__history_box.get_style_context().remove_class('input')
+        self.__bookmarks_box.get_style_context().remove_class('input')
+        self.__tags_box.get_style_context().remove_class('input')
         size = El().window.get_size()
         self.set_size_request(size[0]*0.5, size[1]*0.7)
         self.__scrolled_bookmarks.set_size_request(size[1]*0.7*0.33, -1)
@@ -307,8 +385,7 @@ class UriPopover(Gtk.Popover):
             @param item as Item
         """
         child = Row(item)
-        if child.eventbox is not None:
-            child.eventbox.connect('button-release-event',
-                                   self.__on_button_release,
-                                   item)
+        child.eventbox.connect('button-release-event',
+                               self.__on_button_release,
+                               item)
         return child

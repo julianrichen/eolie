@@ -124,6 +124,7 @@ class ToolbarTitle(Gtk.Bin):
         self.__lock = True
         self.__entry.set_text(self.__uri)
         self.__entry.get_style_context().remove_class('uribar-title')
+        self.__entry.get_style_context().add_class('input')
         self.__popover.set_relative_to(self)
         self.__popover.show()
         self.__signal_id = self.__entry.connect('changed',
@@ -142,6 +143,7 @@ class ToolbarTitle(Gtk.Bin):
         if self.__entry.get_placeholder_text():
             self.__entry.set_text("")
             self.__entry.get_style_context().add_class('uribar-title')
+        self.__entry.get_style_context().remove_class('input')
 
     def _on_key_press_event(self, entry, event):
         """
@@ -149,14 +151,13 @@ class ToolbarTitle(Gtk.Bin):
             @param entry as Gtk.Entry
             @param event as Gdk.Event
         """
-        if event.keyval in [Gdk.KEY_Down, Gdk.KEY_Up]:
-            self.__popover.send_event_to_history(event)
-            return True
-        elif event.keyval == Gdk.KEY_Return and entry.get_text() == self.__uri:
-            self.__popover.send_event_to_history(event)
-            return True
-        elif event.keyval in [Gdk.KEY_Return, Gdk.KEY_Escape]:
-            GLib.idle_add(self.hide_popover)
+        forwarded = self.__popover.forward_event(event)
+        if forwarded:
+            self.__entry.get_style_context().remove_class('input')
+        else:
+            self.__entry.get_style_context().add_class('input')
+            if event.keyval in [Gdk.KEY_Return, Gdk.KEY_Escape]:
+                GLib.idle_add(self.hide_popover)
 
     def _on_reload_press(self, eventbox, event):
         """
