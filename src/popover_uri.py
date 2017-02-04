@@ -256,7 +256,6 @@ class UriPopover(Gtk.Popover):
                 return True
             else:
                 self.__input = Input.NONE
-                box.get_style_context().remove_class('input')
                 return False
         else:
             self.__input = Input.NONE
