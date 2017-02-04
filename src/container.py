@@ -92,6 +92,14 @@ class Container(Gtk.Paned):
         return self.__stack_sidebar
 
     @property
+    def views(self):
+        """
+            Get views
+            @return views as [WebView]
+        """
+        return self.__stack.get_children()
+
+    @property
     def current(self):
         """
             Current view

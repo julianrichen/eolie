@@ -322,12 +322,27 @@ class StackSidebar(Gtk.Grid):
             else:
                 child.get_style_context().remove_class('sidebar-item-selected')
 
+    @property
+    def current(self):
+        """
+            Current child
+            @return child SidebarChild
+        """
+        visible = self.__stack.get_visible_child()
+        for child in self.__listbox.get_children():
+            if child.view == visible:
+                return child
+
 #######################
 # PRIVATE             #
 #######################
     def __on_child_destroy(self, child):
+        """
+            Destroy associated view
+            @param child as SidebarChild
+        """
         if len(self.__listbox.get_children()) == 0:
-            El().window.new_web_view(True)
+            El().window.container.add_web_view("google.fr", True)
         child.view.destroy()
 
     def __on_row_activated(self, listbox, row):

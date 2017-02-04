@@ -94,6 +94,8 @@ class Application(Gtk.Application):
         shortcut_action.connect('activate', self.__on_shortcut_action)
         self.add_action(shortcut_action)
         self.set_accels_for_action("app.shortcut::uri", ["<Control>l"])
+        self.set_accels_for_action("app.shortcut::new_page", ["<Control>t"])
+        self.set_accels_for_action("app.shortcut::close_page", ["<Control>w"])
 
         # Set some WebKit defaults
         context = WebKit2.WebContext.get_default()
@@ -244,3 +246,7 @@ class Application(Gtk.Application):
         string = param.get_string()
         if string == "uri":
             self.window.toolbar.title.focus_entry()
+        elif string == "new_page":
+            self.window.container.add_web_view("google.fr", True)
+        elif string == "close_page":
+            self.window.container.sidebar.current.destroy()
