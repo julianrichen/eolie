@@ -112,7 +112,7 @@ class Row(Gtk.ListBoxRow):
 
 class Input:
     NONE = 0
-    HISTORY = 1
+    SEARCH = 1
     TAGS = 2
     BOOKMARKS = 3
 
@@ -178,7 +178,7 @@ class UriPopover(Gtk.Popover):
             return False
         if event.keyval == Gdk.KEY_Up and self.__input == Input.NONE:
             return False
-        if event.keyval == Gdk.KEY_Left and self.__input == Input.BOOKMARKS:
+        elif event.keyval == Gdk.KEY_Left and self.__input == Input.BOOKMARKS:
             self.__input = Input.TAGS
             self.__tags_box.get_style_context().add_class('input')
             self.__bookmarks_box.get_style_context().remove_class('input')
@@ -191,9 +191,8 @@ class UriPopover(Gtk.Popover):
         elif event.keyval in [Gdk.KEY_Down, Gdk.KEY_Up]:
             # If nothing selected, detect default widget
             if self.__input == Input.NONE:
-                if self.__stack.get_visible_child_name() == "history":
-                    self.__input = Input.HISTORY
-                    self.__history_box.get_style_context().add_class('input')
+                if self.__stack.get_visible_child_name() == "search":
+                    self.__input = Input.SEARCH
                 elif self.__stack.get_visible_child_name() == "bookmarks":
                     self.__tags_box.get_style_context().add_class('input')
                     self.__input = Input.TAGS
@@ -231,7 +230,7 @@ class UriPopover(Gtk.Popover):
                     return True
                 elif idx < 0:
                     # Do not go to uribar for bookmarks list
-                    if self.__input in [Input.BOOKMARKS, Input.HISTORY]:
+                    if self.__input in [Input.BOOKMARKS, Input.SEARCH]:
                         box.select_row(rows[-1])
                         return True
                     else:
@@ -271,7 +270,7 @@ class UriPopover(Gtk.Popover):
             Init history
             @param widget as Gtk.Widget
         """
-        self.__input == Input.HISTORY
+        self.__input == Input.SEARCH
         self.set_history_text("")
 
     def _on_bookmarks_map(self, widget):
@@ -303,7 +302,7 @@ class UriPopover(Gtk.Popover):
             @return Gtk.ListBox
         """
         box = None
-        if self.__input == Input.HISTORY:
+        if self.__input == Input.SEARCH:
             box = self.__history_box
         elif self.__input == Input.TAGS:
             box = self.__tags_box
