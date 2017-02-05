@@ -39,8 +39,8 @@ class SidebarChild(Gtk.ListBoxRow):
         self.__uri = builder.get_object('uri')
         self.__image = builder.get_object('image')
         self.__image_close = builder.get_object('image_close')
-        self.__image_close.set_from_icon_name('web-browser-symbolic',
-                                              Gtk.IconSize.DIALOG)
+        self.__image_close.set_from_icon_name('applications-internet',
+                                              Gtk.IconSize.MENU)
         self.__title.set_label("Empty page")
         self.add(builder.get_object('widget'))
         view.connect('notify::favicon', self.__on_notify_favicon)
@@ -170,8 +170,8 @@ class SidebarChild(Gtk.ListBoxRow):
             self.__image_close.set_from_surface(favicon)
             del favicon
         else:
-            self.__image_close.set_from_icon_name('web-browser-symbolic',
-                                                  Gtk.IconSize.DIALOG)
+            self.__image_close.set_from_icon_name('applications-internet',
+                                                  Gtk.IconSize.MENU)
 
     def __on_title_changed(self, view, event):
         """
@@ -226,8 +226,8 @@ class SidebarChild(Gtk.ListBoxRow):
         """
         surface = self.__get_favicon(self.__view.get_favicon())
         if surface is None:
-            self.__image_close.set_from_icon_name('web-browser-symbolic',
-                                                  Gtk.IconSize.DIALOG)
+            self.__image_close.set_from_icon_name('applications-internet',
+                                                  Gtk.IconSize.MENU)
             return
         El().art.save_artwork(self.__view.get_uri(), surface, "favicon")
         El().art.save_artwork(self.__view.loaded_uri, surface, "favicon")
@@ -283,8 +283,8 @@ class SidebarChild(Gtk.ListBoxRow):
             @param pointer as GParamPointer => unused
         """
         if view.get_favicon() is None:
-            self.__image_close.set_from_icon_name('web-browser-symbolic',
-                                                  Gtk.IconSize.DIALOG)
+            self.__image_close.set_from_icon_name('applications-internet',
+                                                  Gtk.IconSize.MENU)
         else:
             self.__set_favicon()
 
