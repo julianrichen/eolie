@@ -154,6 +154,7 @@ class ToolbarTitle(Gtk.Bin):
         forwarded = self.__popover.forward_event(event)
         if forwarded:
             self.__entry.get_style_context().remove_class('input')
+            return True
         else:
             self.__entry.get_style_context().add_class('input')
             if event.keyval in [Gdk.KEY_Return, Gdk.KEY_Escape]:

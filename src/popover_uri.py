@@ -188,6 +188,9 @@ class UriPopover(Gtk.Popover):
             self.__bookmarks_box.get_style_context().add_class('input')
             self.__tags_box.get_style_context().remove_class('input')
             return True
+        elif event.keyval in [Gdk.KEY_Left, Gdk.KEY_Right] and\
+                self.__input != Input.NONE:
+            return True
         elif event.keyval in [Gdk.KEY_Down, Gdk.KEY_Up]:
             # If nothing selected, detect default widget
             if self.__input == Input.NONE:
