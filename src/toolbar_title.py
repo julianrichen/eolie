@@ -189,8 +189,10 @@ class ToolbarTitle(Gtk.Bin):
             Go to url or search for words
             @param entry as Gtk.Entry
         """
-        text = entry.get_text()
-        El().window.container.load_uri(text)
+        uri = entry.get_text()
+        if El().search.is_search(uri):
+            uri = El().search.get_search_uri(uri)
+        El().window.container.load_uri(uri)
 
 #######################
 # PRIVATE             #

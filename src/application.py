@@ -22,6 +22,7 @@ from eolie.window import Window
 from eolie.art import Art
 from eolie.database_history import DatabaseHistory
 from eolie.database_bookmarks import DatabaseBookmarks
+from eolie.search import Search
 
 
 class Application(Gtk.Application):
@@ -88,6 +89,7 @@ class Application(Gtk.Application):
         self.bookmarks = DatabaseBookmarks()
         self.bookmarks.import_firefox()
         self.art = Art()
+        self.search = Search()
 
         shortcut_action = Gio.SimpleAction.new('shortcut',
                                                GLib.VariantType.new('s'))
