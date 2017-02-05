@@ -43,10 +43,11 @@ class SidebarChild(Gtk.ListBoxRow):
                                               Gtk.IconSize.DIALOG)
         self.__title.set_label("Empty page")
         self.add(builder.get_object('widget'))
-        view.connect("notify::favicon", self.__on_notify_favicon)
+        view.connect('notify::favicon', self.__on_notify_favicon)
         view.connect('scroll-event', self.__on_scroll_event)
-        view.connect("notify::uri", self.__on_uri_changed)
-        view.connect("notify::title", self.__on_title_changed)
+        view.connect('notify::uri', self.__on_uri_changed)
+        view.connect('notify::title', self.__on_title_changed)
+        view.connect('load-changed', self.__on_load_changed)
         self.get_style_context().add_class('sidebar-item')
 
     @property
@@ -263,6 +264,17 @@ class SidebarChild(Gtk.ListBoxRow):
             El().art.save_artwork(self.__view.loaded_uri, surface, "preview")
         del surface
         self.set_offscreen(False)
+
+    def __on_load_changed(self, view, event):
+        """
+            Update sidebar/urlbar
+            @param view as WebView
+            @param event as WebKit2.LoadEvent
+        """
+        if event == WebKit2.LoadEvent.STARTED:
+            pass
+        if event == WebKit2.LoadEvent.FINISHED:
+            GLib.timeout_add(500, self.__get_snapshot, True)
 
     def __on_notify_favicon(self, view, pointer):
         """
