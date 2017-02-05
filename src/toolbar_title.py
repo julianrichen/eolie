@@ -223,7 +223,9 @@ class ToolbarTitle(Gtk.Bin):
         self.__keywords_cancellable.reset()
         keywords = El().search.get_keywords(value, self.__keywords_cancellable)
         for words in keywords:
-            GLib.idle_add(self.__popover.add_keywords, words.replace('"', ''))
+            if words:
+                GLib.idle_add(self.__popover.add_keywords,
+                              words.replace('"', ''))
 
     def __on_entry_changed(self, entry):
         """
