@@ -8,17 +8,17 @@
     <property name="vexpand">False</property>
     <property name="spacing">6</property>
     <child>
-      <object class="GtkButton" id="search-button">
+      <object class="GtkButton" id="adblock-button">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="receives_default">False</property>
-        <property name="tooltip_text" translatable="yes">Search</property>
+        <property name="tooltip_text" translatable="yes">Hide ads</property>
         <property name="valign">center</property>
         <child>
-          <object class="GtkImage" id="search-button-image">
+          <object class="GtkImage" id="adblock-button-image">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="icon_name">edit-find-symbolic</property>
+            <property name="icon_name">user-not-tracked-symbolic</property>
             <property name="icon_size">1</property>
           </object>
         </child>
