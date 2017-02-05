@@ -10,7 +10,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, Gdk, GLib, Gio
+
+from threading import Thread
 
 from eolie.define import El
 from eolie.popover_uri import UriPopover
@@ -30,6 +32,8 @@ class ToolbarTitle(Gtk.Bin):
         self.__lock = False
         self.__in_notify = False
         self.__signal_id = None
+        self.__keywords_timeout = None
+        self.__keywords_cancellable = Gio.Cancellable.new()
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarTitle.ui')
         builder.connect_signals(self)
@@ -74,6 +78,8 @@ class ToolbarTitle(Gtk.Bin):
         self.__in_notify = False
         if self.__popover.is_visible():
             self.__popover.hide()
+            self.__keywords_cancellable.cancel()
+            self.__keywords_cancellable.reset()
             El().window.set_focus(None)
 
     def focus_entry(self):
@@ -197,6 +203,28 @@ class ToolbarTitle(Gtk.Bin):
 #######################
 # PRIVATE             #
 #######################
+    def __search_keywords_thread(self, value):
+        """
+            Run __search_keywords() in a thread
+            @param value a str
+        """
+        self.__keywords_timeout = None
+        self.__thread = Thread(target=self.__search_keywords,
+                               args=(value,))
+        self.__thread.daemon = True
+        self.__thread.start()
+
+    def __search_keywords(self, value):
+        """
+            Search for keywords for value
+            @param value as str
+        """
+        self.__keywords_cancellable.cancel()
+        self.__keywords_cancellable.reset()
+        keywords = El().search.get_keywords(value, self.__keywords_cancellable)
+        for words in keywords:
+            GLib.idle_add(self.__popover.add_keywords, words.replace('"', ''))
+
     def __on_entry_changed(self, entry):
         """
             Update popover search if needed
@@ -206,3 +234,10 @@ class ToolbarTitle(Gtk.Bin):
             self.__popover.set_history_text("")
         else:
             self.__popover.set_history_text(value)
+        if self.__keywords_timeout is not None:
+            GLib.source_remove(self.__keywords_timeout)
+        if Gio.NetworkMonitor.get_default().get_network_available():
+            self.__keywords_timeout = GLib.timeout_add(
+                                                 500,
+                                                 self.__search_keywords_thread,
+                                                 value)

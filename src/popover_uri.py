@@ -136,7 +136,6 @@ class UriPopover(Gtk.Popover):
         self.__history_model = Gio.ListStore()
         self.__history_box = builder.get_object('history_box')
         self.__stack = builder.get_object('stack')
-        self.__stack.set_visible_child_name("bookmarks")
         self.__history_box.bind_model(self.__history_model,
                                       self.__on_item_create)
         self.__bookmarks_model = Gio.ListStore()
@@ -167,6 +166,18 @@ class UriPopover(Gtk.Popover):
         self.__history_model.remove_all()
         self.__stack.set_visible_child_name("search")
         self.__set_history_text(search)
+
+    def add_keywords(self, words):
+        """
+            Add keywords to search
+            @param words as str
+        """
+        if self.__stack.get_visible_child_name() != "search":
+            return
+        item = Item()
+        item.set_property("title", words)
+        item.set_property("uri", El().search.get_search_uri(words))
+        self.__history_model.insert(0, item)
 
     def forward_event(self, event):
         """
@@ -393,6 +404,7 @@ class UriPopover(Gtk.Popover):
         self.__history_box.get_style_context().remove_class('input')
         self.__bookmarks_box.get_style_context().remove_class('input')
         self.__tags_box.get_style_context().remove_class('input')
+        self.__stack.set_visible_child_name('bookmarks')
         size = El().window.get_size()
         self.set_size_request(size[0]*0.5, size[1]*0.7)
         self.__scrolled_bookmarks.set_size_request(size[1]*0.7*0.33, -1)
