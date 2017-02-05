@@ -267,6 +267,20 @@ class UriPopover(Gtk.Popover):
 #######################
 # PROTECTED           #
 #######################
+    def _on_row_selected(self, listbox, row):
+        """
+            Scroll to row
+            @param listbox as Gtk.ListBox
+            @param row as Row
+        """
+        if row is None:
+            return
+        scrolled = listbox.get_ancestor(Gtk.ScrolledWindow)
+        if scrolled is None:
+            return
+        y = row.translate_coordinates(listbox, 0, 0)[1]
+        scrolled.get_vadjustment().set_value(y)
+
     def _on_history_map(self, widget):
         """
             Init history
