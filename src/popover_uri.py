@@ -342,16 +342,16 @@ class UriPopover(Gtk.Popover):
             item.set_property("uri", uri)
             self.__bookmarks_model.append(item)
 
-    def __handle_event(self, event, item):
+    def __handle_click(self, button, item):
         """
-            Handle event (button press)
-            @param event as Gdk.Event
+            Handle click
+            @param button as int
             @param item as Item
         """
         uri = item.get_property("uri")
         item_id = item.get_property("id")
         if item_id == BookmarksType.URI:
-            if event.button == 1:
+            if button == 1:
                 El().window.container.current.load_uri(uri)
             else:
                 El().window.container.add_web_view(uri, True)
@@ -368,7 +368,7 @@ class UriPopover(Gtk.Popover):
         if item.get_property("id") == BookmarksType.URI:
             El().window.toolbar.title.hide_popover()
         # Needed to not conflict with popover hidding
-        GLib.idle_add(self.__handle_event, event, item)
+        GLib.idle_add(self.__handle_click, event.button, item)
 
     def __on_map(self, widget):
         """
