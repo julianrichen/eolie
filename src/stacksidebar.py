@@ -344,6 +344,7 @@ class StackSidebar(Gtk.Grid):
         if len(self.__listbox.get_children()) == 0:
             El().window.container.add_web_view("google.fr", True)
         child.view.destroy()
+        self.update_visible_child()
 
     def __on_row_activated(self, listbox, row):
         """
