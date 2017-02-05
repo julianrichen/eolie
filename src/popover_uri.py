@@ -407,7 +407,7 @@ class UriPopover(Gtk.Popover):
         self.__stack.set_visible_child_name('bookmarks')
         size = El().window.get_size()
         self.set_size_request(size[0]*0.5, size[1]*0.7)
-        self.__scrolled_bookmarks.set_size_request(size[1]*0.7*0.33, -1)
+        self.__scrolled_bookmarks.set_size_request(size[1]*0.7*0.5, -1)
 
     def __on_item_create(self, item):
         """
