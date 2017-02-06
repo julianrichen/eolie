@@ -60,6 +60,9 @@ class Row(Gtk.ListBoxRow):
                                            Gtk.IconSize.MENU)
             else:
                 del surface
+        elif item_id == BookmarksType.SEARCH:
+            favicon = Gtk.Image.new_from_icon_name("system-search-symbolic",
+                                                   Gtk.IconSize.MENU)
         else:
             if item_id == BookmarksType.POPULARS:
                 icon_name = "starred-symbolic"
@@ -135,6 +138,7 @@ class UriPopover(Gtk.Popover):
         self.__scrolled_bookmarks = builder.get_object('scrolled_bookmarks')
         self.__history_model = Gio.ListStore()
         self.__history_box = builder.get_object('history_box')
+        self.__history_box.set_sort_func(self.__sort_history)
         self.__stack = builder.get_object('stack')
         self.__history_box.bind_model(self.__history_model,
                                       self.__on_item_create)
@@ -175,9 +179,10 @@ class UriPopover(Gtk.Popover):
         if self.__stack.get_visible_child_name() != "search":
             return
         item = Item()
+        item.set_property("id", BookmarksType.SEARCH)
         item.set_property("title", words)
         item.set_property("uri", El().search.get_search_uri(words))
-        self.__history_model.insert(0, item)
+        self.__history_model.append(item)
 
     def forward_event(self, event):
         """
@@ -325,6 +330,18 @@ class UriPopover(Gtk.Popover):
 #######################
 # PRIVATE             #
 #######################
+    def __sort_history(self, row1, row2):
+        """
+            Sort rows
+            @param row1 as Row
+            @param row2 as Row
+        """
+        row1_id = row1.item.get_property("id")
+        if row1_id == BookmarksType.URI:
+            tag_id = El().bookmarks.get_id(row1.item.get_property("uri"))
+            return tag_id is None
+        return True
+
     def __get_current_box(self):
         """
             Get current box

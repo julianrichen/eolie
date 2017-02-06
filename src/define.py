@@ -25,4 +25,5 @@ class BookmarksType:
     POPULARS = -1
     RECENTS = -2
     URI = -3
-    SEPARATOR = -4
+    SEARCH = -4
+    SEPARATOR = -5
