@@ -185,6 +185,7 @@ class Container(Gtk.Paned):
             @param view as WebView
             @param event as WebKit2.LoadEvent
         """
+        El().window.toolbar.title.on_load_changed(view, event)
         if event == WebKit2.LoadEvent.STARTED:
             self.__progress.show()
         if event == WebKit2.LoadEvent.FINISHED:

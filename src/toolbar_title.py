@@ -39,7 +39,7 @@ class ToolbarTitle(Gtk.Bin):
         builder.connect_signals(self)
         self.__entry = builder.get_object('entry')
         self.__popover = UriPopover()
-        self.__reload_image = builder.get_object('reload_image')
+        self.__action_image = builder.get_object('action_image')
         self.add(builder.get_object('widget'))
 
     def set_width(self, width):
@@ -87,6 +87,19 @@ class ToolbarTitle(Gtk.Bin):
             Focus entry
         """
         self.get_toplevel().set_focus(self.__entry)
+
+    def on_load_changed(self, view, event):
+        """
+            Update action image
+            @param view as WebView
+            @param event as WebKit2.LoadEvent
+        """
+        if view.is_loading():
+            self.__action_image.set_from_icon_name('process-stop-symbolic',
+                                                   Gtk.IconSize.MENU)
+        else:
+            self.__action_image.set_from_icon_name('view-refresh-symbolic',
+                                                   Gtk.IconSize.MENU)
 
 #######################
 # PROTECTED           #
@@ -166,29 +179,32 @@ class ToolbarTitle(Gtk.Bin):
             if event.keyval in [Gdk.KEY_Return, Gdk.KEY_Escape]:
                 GLib.idle_add(self.hide_popover)
 
-    def _on_reload_press(self, eventbox, event):
+    def _on_action_press(self, eventbox, event):
         """
             Reload current view
             @param eventbox as Gtk.EventBox
             @param event as Gdk.Event
         """
-        El().window.container.current.reload()
+        if self.__action_image.get_icon_name()[0] == 'view-refresh-symbolic':
+            El().window.container.current.reload()
+        else:
+            El().window.container.current.stop_loading()
 
-    def _on_reload_enter_notify(self, eventbox, event):
+    def _on_action_enter_notify(self, eventbox, event):
         """
             Change opacity
             @param eventbox as Gtk.EventBox
             @param event as Gdk.Event
         """
-        self.__reload_image.set_opacity(1)
+        self.__action_image.set_opacity(1)
 
-    def _on_reload_leave_notify(self, eventbox, event):
+    def _on_action_leave_notify(self, eventbox, event):
         """
             Change opacity
             @param eventbox as Gtk.EventBox
             @param event as Gdk.Event
         """
-        self.__reload_image.set_opacity(0.8)
+        self.__action_image.set_opacity(0.8)
 
     def _on_activate(self, entry):
         """

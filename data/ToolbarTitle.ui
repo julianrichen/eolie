@@ -36,9 +36,9 @@
             <property name="margin_right">5</property>
             <property name="vexpand">True</property>
             <property name="above_child">True</property>
-            <signal name="button-press-event" handler="_on_reload_press" swapped="no"/>
-            <signal name="enter-notify-event" handler="_on_reload_enter_notify" object="reload_image" swapped="no"/>
-            <signal name="leave-notify-event" handler="_on_reload_leave_notify" object="reload_image" swapped="no"/>
+            <signal name="button-press-event" handler="_on_action_press" swapped="no"/>
+            <signal name="enter-notify-event" handler="_on_action_enter_notify" object="action_image" swapped="no"/>
+            <signal name="leave-notify-event" handler="_on_action_leave_notify" object="action_image" swapped="no"/>
             <child>
               <object class="GtkGrid">
                 <property name="visible">True</property>
@@ -46,7 +46,7 @@
                 <property name="vexpand">True</property>
                 <property name="column_spacing">5</property>
                 <child>
-                  <object class="GtkImage" id="reload_image">
+                  <object class="GtkImage" id="action_image">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="opacity">0.80000000000000004</property>
