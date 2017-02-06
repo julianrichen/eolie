@@ -136,12 +136,14 @@ class UriPopover(Gtk.Popover):
         builder.add_from_resource('/org/gnome/Eolie/PopoverUri.ui')
         builder.connect_signals(self)
         self.__scrolled_bookmarks = builder.get_object('scrolled_bookmarks')
-        self.__history_model = Gio.ListStore()
+        # Sorting is broken when using a model
+        # We should be using Gio.ListStore insert_sorted() but seems broken too
+        # self.__history_model = Gio.ListStore()
         self.__history_box = builder.get_object('history_box')
         self.__history_box.set_sort_func(self.__sort_history)
         self.__stack = builder.get_object('stack')
-        self.__history_box.bind_model(self.__history_model,
-                                      self.__on_item_create)
+        # self.__history_box.bind_model(self.__history_model,
+        #                               self.__on_item_create)
         self.__bookmarks_model = Gio.ListStore()
         self.__tags_model = Gio.ListStore()
         self.__tags = builder.get_object('tags')
@@ -167,7 +169,9 @@ class UriPopover(Gtk.Popover):
             Set history model
             @param search as str
         """
-        self.__history_model.remove_all()
+        for child in self.__history_box.get_children():
+            child.destroy()
+        # self.__history_model.remove_all()
         self.__stack.set_visible_child_name("search")
         self.__set_history_text(search)
 
@@ -182,7 +186,13 @@ class UriPopover(Gtk.Popover):
         item.set_property("id", BookmarksType.SEARCH)
         item.set_property("title", words)
         item.set_property("uri", El().search.get_search_uri(words))
-        self.__history_model.append(item)
+        # self.__history_model.append(item)
+        child = Row(item)
+        child.eventbox.connect('button-release-event',
+                               self.__on_button_release,
+                               item)
+        child.show()
+        self.__history_box.add(child)
 
     def forward_event(self, event):
         """
@@ -366,7 +376,13 @@ class UriPopover(Gtk.Popover):
             item = Item()
             item.set_property("title", title)
             item.set_property("uri", uri)
-            self.__history_model.append(item)
+            # self.__history_model.append(item)
+            child = Row(item)
+            child.eventbox.connect('button-release-event',
+                                   self.__on_button_release,
+                                   item)
+            child.show()
+            self.__history_box.add(child)
 
     def __set_bookmarks(self, tag_id):
         """
