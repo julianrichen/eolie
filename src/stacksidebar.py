@@ -355,7 +355,7 @@ class StackSidebar(Gtk.Grid):
             @param child as SidebarChild
         """
         if len(self.__listbox.get_children()) == 0:
-            self.__container.window.add_web_view("google.fr", True)
+            self.__container.add_web_view("google.fr", True)
         child.view.destroy()
         self.update_visible_child()
 
