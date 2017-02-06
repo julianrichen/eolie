@@ -17,7 +17,7 @@
 
 .sidebarchild-title {
     background-color: @theme_selected_fg_color;
-    opacity: 0.97;
+    opacity: 0.96;
 }
 
 .sidebarchild-image {
