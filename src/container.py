@@ -133,12 +133,13 @@ class Container(Gtk.Paned):
             Update window
             @param view as WebView
         """
-        self.window.toolbar.title.set_uri(view.get_uri())
-        if view.is_loading():
-            self.__progress.show()
-        else:
-            self.__progress.hide()
-            self.window.toolbar.title.set_title(view.get_title())
+        if view == self.current:
+            self.window.toolbar.title.set_uri(view.get_uri())
+            if view.is_loading():
+                self.__progress.show()
+            else:
+                self.__progress.hide()
+                self.window.toolbar.title.set_title(view.get_title())
 
     def __on_button_press(self, widget, event):
         """
@@ -154,8 +155,9 @@ class Container(Gtk.Paned):
             @param view as WebView
             @param UNUSED
         """
-        value = view.get_estimated_load_progress()
-        self.__progress.set_fraction(value)
+        if view == self.current:
+            value = view.get_estimated_load_progress()
+            self.__progress.set_fraction(value)
 
     def __on_uri_changed(self, view, uri):
         """
@@ -215,7 +217,8 @@ class Container(Gtk.Paned):
             @param event as WebKit2.LoadEvent
         """
         self.window.toolbar.title.on_load_changed(view, event)
-        if event == WebKit2.LoadEvent.STARTED:
-            self.__progress.show()
-        if event == WebKit2.LoadEvent.FINISHED:
-            self.__progress.hide()
+        if view == self.current:
+            if event == WebKit2.LoadEvent.STARTED:
+                self.__progress.show()
+            if event == WebKit2.LoadEvent.FINISHED:
+                self.__progress.hide()
