@@ -48,6 +48,8 @@ class WebView(WebKit2.WebView):
         self.set_settings(settings)
         self.show()
         self.connect('decide-policy', self.__on_decide_policy)
+        self.get_context().connect('download-started',
+                                   self.__on_download_started)
 
     def load_uri(self, uri):
         """
@@ -70,6 +72,14 @@ class WebView(WebKit2.WebView):
 #######################
 # PRIVATE             #
 #######################
+    def __on_download_started(self, context, download):
+        """
+            A new download started, handle signals
+            @param context as WebKit2.WebContext
+            @param download as WebKit2.Download
+        """
+        El().downloads_manager.add(download)
+
     def __on_decide_policy(self, view, decision, decision_type):
         """
             Navigation policy
@@ -80,7 +90,11 @@ class WebView(WebKit2.WebView):
         """
         # Always accept response
         if decision_type == WebKit2.PolicyDecisionType.RESPONSE:
-            decision.use()
+            mime_type = decision.get_response().props.mime_type
+            if "application/" in mime_type:
+                decision.download()
+            else:
+                decision.use()
             return False
 
         uri = decision.get_navigation_action().get_request().get_uri()

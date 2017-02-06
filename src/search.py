@@ -28,7 +28,7 @@ class Search:
 
     def __init__(self):
         """
-            Init toolbar
+            Init search
         """
         self.update_default_engine()
 

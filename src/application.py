@@ -26,6 +26,7 @@ from eolie.database_bookmarks import DatabaseBookmarks
 from eolie.database_adblock import DatabaseAdblock
 from eolie.sqlcursor import SqlCursor
 from eolie.search import Search
+from eolie.downloads_manager import DownloadsManager
 
 
 class Application(Gtk.Application):
@@ -99,6 +100,7 @@ class Application(Gtk.Application):
         adblock.update()
         self.art = Art()
         self.search = Search()
+        self.downloads_manager = DownloadsManager()
 
         shortcut_action = Gio.SimpleAction.new('shortcut',
                                                GLib.VariantType.new('s'))
@@ -143,6 +145,7 @@ class Application(Gtk.Application):
                 self.window = Window()
             else:
                 self.window = Window()
+                self._window.connect('delete-event', self.__on_delete_event)
                 self.window.setup_menu(menu)
             self.window.show()
             self.window.container.add_web_view("google.fr", True)
@@ -151,6 +154,7 @@ class Application(Gtk.Application):
         """
             Save window position and view
         """
+        self.downloads_manager.cancel()
         if exit:
             self.quit()
 
@@ -163,6 +167,14 @@ class Application(Gtk.Application):
 #######################
 # PRIVATE             #
 #######################
+    def __on_delete_event(self, widget, event):
+        """
+            Exit application
+            @param widget as Gtk.Widget
+            @param event as Gdk.Event
+        """
+        self.prepare_to_exit()
+
     def __settings_dialog(self, action=None, param=None):
         """
             Show settings dialog

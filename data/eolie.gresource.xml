@@ -5,7 +5,9 @@
     <file compressed="true" preprocess="xml-stripblanks">Appmenu.ui</file>
     <file>application.css</file>
     <file>application-legacy.css</file>
+    <file compressed="true" preprocess="xml-stripblanks">PopoverDownloads.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">PopoverUri.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">RowDownload.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">Shortcuts.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">SidebarChild.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ToolbarActions.ui</file>

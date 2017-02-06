@@ -13,6 +13,7 @@
 from gi.repository import Gtk, GLib
 
 from eolie.define import El
+from eolie.popover_downloads import DownloadsPopover
 
 
 class ToolbarEnd(Gtk.Bin):
@@ -36,7 +37,16 @@ class ToolbarEnd(Gtk.Bin):
 #######################
 # PROTECTED           #
 #######################
-    def _on_adblock_clicked(self, button):
+    def _on_download_button_clicked(self, button):
+        """
+            Show download popover
+            @param button as Gtk.Button
+        """
+        popover = DownloadsPopover()
+        popover.set_relative_to(button)
+        popover.show()
+
+    def _on_adblock_button_clicked(self, button):
         """
             Switch add blocking on/off
             @param button as Gtk.Button
