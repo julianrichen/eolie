@@ -202,7 +202,9 @@ class ToolbarTitle(Gtk.Bin):
             return True
         else:
             self.__entry.get_style_context().add_class('input')
-            if event.keyval in [Gdk.KEY_Return, Gdk.KEY_Escape]:
+            if event.keyval in [Gdk.KEY_Return,
+                                Gdk.KEY_KP_Enter,
+                                Gdk.KEY_Escape]:
                 GLib.idle_add(self.hide_popover)
 
     def _on_action_press(self, eventbox, event):

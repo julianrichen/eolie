@@ -263,7 +263,7 @@ class UriPopover(Gtk.Popover):
                         item_id = rows[idx].item.get_property("id")
                         self.__set_bookmarks(item_id)
                     return True
-        elif event.keyval == Gdk.KEY_Return:
+        elif event.keyval in [Gdk.KEY_Return, Gdk.KEY_KP_Enter]:
             box = self.__get_current_box()
             if box is not None:
                 selected = box.get_selected_row()
