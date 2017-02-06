@@ -61,10 +61,12 @@ class Container(Gtk.Paned):
                      self.__on_estimated_load_progress)
         view.connect('load-changed', self.__on_load_changed)
         view.connect('button-press-event', self.__on_button_press)
-        view.connect("notify::uri", self.__on_uri_changed)
-        view.connect("notify::title", self.__on_title_changed)
+        view.connect('notify::uri', self.__on_uri_changed)
+        view.connect('notify::title', self.__on_title_changed)
         view.connect('enter-fullscreen', self.__on_enter_fullscreen)
         view.connect('leave-fullscreen', self.__on_leave_fullscreen)
+        view.connect('insecure-content-detected',
+                     self.__on_insecure_content_detected)
 
         if uri != "about:blank":
             view.load_uri(uri)
@@ -186,14 +188,23 @@ class Container(Gtk.Paned):
     def __on_enter_fullscreen(self, view):
         """
             Hide sidebar (conflict with fs)
+            @param view as WebView
         """
         self.__stack_sidebar.hide()
 
     def __on_leave_fullscreen(self, view):
         """
             Show sidebar (conflict with fs)
+            @param view as WebView
         """
         self.__stack_sidebar.show()
+
+    def __on_insecure_content_detected(self, view, event):
+        """
+            @param view as WebView
+            @param event as WebKit2.InsecureContentEvent
+        """
+        self.window.toolbar.title.set_insecure_content()
 
     def __on_load_changed(self, view, event):
         """

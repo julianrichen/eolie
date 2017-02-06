@@ -15,7 +15,6 @@
           <object class="GtkEntry" id="entry">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="primary_icon_name">changes-prevent-symbolic</property>
             <signal name="activate" handler="_on_activate" swapped="no"/>
             <signal name="focus-in-event" handler="_on_entry_focus_in" swapped="no"/>
             <signal name="focus-out-event" handler="_on_entry_focus_out" swapped="no"/>
