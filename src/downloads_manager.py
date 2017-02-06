@@ -10,7 +10,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import GObject
+from gi.repository import GObject, GLib, Gio
+
+from re import search
 
 
 class DownloadsManager(GObject.GObject):
@@ -37,7 +39,7 @@ class DownloadsManager(GObject.GObject):
         download.connect('finished', self.__on_finished)
         download.connect('failed', self.__on_failed)
         self.emit('download-changed')
-        # download.connect('decide-destination', self.__on_decide_destination)
+        download.connect('decide-destination', self.__on_decide_destination)
 
     def get_all(self):
         """
@@ -56,6 +58,38 @@ class DownloadsManager(GObject.GObject):
 #######################
 # PRIVATE             #
 #######################
+    def __on_decide_destination(self, download, filename):
+        """
+            Modify destination if needed
+            @param download as WebKit2.Download
+            @param filename as str
+        """
+        directory = GLib.get_user_special_dir(
+                                         GLib.UserDirectory.DIRECTORY_DOWNLOAD)
+        directory_uri = GLib.filename_to_uri(directory, None)
+        destination_uri = "%s/%s" % (directory_uri, filename)
+        not_ok = True
+        i = 1
+        try:
+            while not_ok:
+                f = Gio.File.new_for_uri(destination_uri)
+                if f.query_exists():
+                    m = search('(.*)(\.[^\./]*$)', filename)
+                    if m is not None:
+                        root_filename = m.group(1)
+                        extension = m.group(2)
+                    else:
+                        root_filename = filename
+                        extension = ""
+                    new_filename = "%s_%s%s" % (root_filename, i, extension)
+                    destination_uri = "%s/%s" % (directory_uri, new_filename)
+                else:
+                    not_ok = False
+        except:
+            # Fallback to be sure
+            destination_uri = "%s/%s" % (directory_uri, "@@" + filename)
+        download.set_destination(destination_uri)
+
     def __on_finished(self, download):
         """
             @param download as WebKit2.Download
