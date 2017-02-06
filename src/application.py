@@ -18,7 +18,7 @@ from gi.repository import Gtk, Gio, GLib, Gdk, WebKit2
 
 from gettext import gettext as _
 
-from eolie.settings import Settings
+from eolie.settings import Settings, SettingsDialog
 from eolie.window import Window
 from eolie.art import Art
 from eolie.database_history import DatabaseHistory
@@ -220,15 +220,16 @@ class Application(Gtk.Application):
         """
         self.prepare_to_exit()
 
-    def __settings_dialog(self, action=None, param=None):
+    def __on_settings_activate(self, action, param):
         """
             Show settings dialog
             @param action as Gio.SimpleAction
             @param param as GLib.Variant
         """
-        pass
+        dialog = SettingsDialog()
+        dialog.show()
 
-    def __about(self, action, param):
+    def __on_about_activate(self, action, param):
         """
             Setup about dialog
             @param action as Gio.SimpleAction
@@ -240,10 +241,10 @@ class Application(Gtk.Application):
         window = self.active_window
         if window is not None:
             about.set_transient_for(window)
-        about.connect("response", self.__about_response)
+        about.connect("response", self.__on_about_activate_response)
         about.show()
 
-    def __shortcuts(self, action, param):
+    def __on_shortcuts_activate(self, action, param):
         """
             Show help in yelp
             @param action as Gio.SimpleAction
@@ -258,9 +259,9 @@ class Application(Gtk.Application):
                 shortcuts.set_transient_for(window)
             shortcuts.show()
         except:  # GTK < 3.20
-            self.__help(action, param)
+            self.__on_help_activate(action, param)
 
-    def __help(self, action, param):
+    def __on_help_activate(self, action, param):
         """
             Show help in yelp
             @param action as Gio.SimpleAction
@@ -271,7 +272,7 @@ class Application(Gtk.Application):
         except:
             print(_("Eolie: You need to install yelp."))
 
-    def __about_response(self, dialog, response_id):
+    def __on_about_activate_response(self, dialog, response_id):
         """
             Destroy about dialog when closed
             @param dialog as Gtk.Dialog
@@ -288,21 +289,25 @@ class Application(Gtk.Application):
         builder.add_from_resource('/org/gnome/Eolie/Appmenu.ui')
         menu = builder.get_object('app-menu')
 
-        aboutAction = Gio.SimpleAction.new('about', None)
-        aboutAction.connect('activate', self.__about)
-        self.add_action(aboutAction)
+        settings_action = Gio.SimpleAction.new('settings', None)
+        settings_action.connect('activate', self.__on_settings_activate)
+        self.add_action(settings_action)
 
-        shortcutsAction = Gio.SimpleAction.new('shortcuts', None)
-        shortcutsAction.connect('activate', self.__shortcuts)
-        self.add_action(shortcutsAction)
+        about_action = Gio.SimpleAction.new('about', None)
+        about_action.connect('activate', self.__on_about_activate)
+        self.add_action(about_action)
 
-        helpAction = Gio.SimpleAction.new('help', None)
-        helpAction.connect('activate', self.__help)
-        self.add_action(helpAction)
+        shortcuts_action = Gio.SimpleAction.new('shortcuts', None)
+        shortcuts_action.connect('activate', self.__on_shortcuts_activate)
+        self.add_action(shortcuts_action)
 
-        quitAction = Gio.SimpleAction.new('quit', None)
-        quitAction.connect('activate', self.prepare_to_exit)
-        self.add_action(quitAction)
+        help_action = Gio.SimpleAction.new('help', None)
+        help_action.connect('activate', self.__on_help_activate)
+        self.add_action(help_action)
+
+        quit_action = Gio.SimpleAction.new('quit', None)
+        quit_action.connect('activate', self.prepare_to_exit)
+        self.add_action(quit_action)
 
         return menu
 

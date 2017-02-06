@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
+    <enum id="org.gnome.Eolie.Cookie">
+       <value nick="always" value="0"/>
+       <value nick="never" value="1"/>
+       <value nick="no_third_party" value="2"/>
+    </enum>
     <schema path="/org/gnome/Eolie/" id="org.gnome.Eolie" gettext-domain="eolie">
         <key type="ai" name="window-size">
             <default>[768, 600]</default>
@@ -24,6 +29,61 @@
 	    <key type="b" name="adblock">
             <default>true</default>
             <summary>Block ads on pages</summary>
+            <description></description>
+        </key>
+	    <key type="s" name="download-uri">
+            <default>""</default>
+            <summary>Download folder uri</summary>
+            <description></description>
+        </key>
+	    <key type="b" name="autostart-downloads">
+            <default>true</default>
+            <summary>Autostart downloads</summary>
+            <description></description>
+        </key>
+	    <key type="s" name="search-engine">
+            <default>"google"</default>
+            <summary>Web search engine</summary>
+            <description></description>
+        </key>
+	    <key type="b" name="remember-session">
+            <default>false</default>
+            <summary>Remember sessions</summary>
+            <description></description>
+        </key>
+	    <key type="b" name="enable-plugins">
+            <default>false</default>
+            <summary>Enable plugins</summary>
+            <description></description>
+        </key>
+	    <key type="b" name="use-system-fonts">
+            <default>false</default>
+            <summary>Use system fonts</summary>
+            <description></description>
+        </key>
+	    <key type="s" name="font-sans-serif">
+            <default>"Sans 10"</default>
+            <summary>Sans serif font</summary>
+            <description></description>
+        </key>
+	    <key type="s" name="font-serif">
+            <default>"Serif 10"</default>
+            <summary>Serif font</summary>
+            <description></description>
+        </key>
+	    <key type="s" name="font-monospace">
+            <default>"Monospace 10"</default>
+            <summary>Monospace font</summary>
+            <description></description>
+        </key>
+	    <key type="i" name="min-font-size">
+            <default>5</default>
+            <summary>Minimum font size</summary>
+            <description></description>
+        </key>
+	    <key enum="org.gnome.Eolie.Cookie" name="cookie-storage">
+            <default>"no_third_party"</default>
+            <summary>Cookie storage type</summary>
             <description></description>
         </key>
     </schema>
