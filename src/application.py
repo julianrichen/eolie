@@ -145,8 +145,8 @@ class Application(Gtk.Application):
                 self.window = Window()
             else:
                 self.window = Window()
-                self._window.connect('delete-event', self.__on_delete_event)
                 self.window.setup_menu(menu)
+            self.window.connect('delete-event', self.__on_delete_event)
             self.window.show()
             self.window.container.add_web_view("google.fr", True)
 
