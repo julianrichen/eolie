@@ -193,7 +193,8 @@ class SidebarChild(Gtk.ListBoxRow):
         if not title:
             title = view.get_uri()
         self.__title.set_text(title)
-        GLib.timeout_add(500, self.__get_snapshot, True)
+        if not view.is_loading():
+            GLib.timeout_add(500, self.__get_snapshot, True)
         if view.get_favicon() is not None:
             GLib.timeout_add(500, self.__set_favicon)
 
