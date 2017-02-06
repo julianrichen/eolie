@@ -26,7 +26,7 @@ from eolie.sqlcursor import SqlCursor
 class Application(Gio.Application):
     def new():
         """
-            Return a new Settings object
+            Return a new application object
         """
         app = Gio.Application.new(None, Gio.ApplicationFlags.IS_SERVICE)
         app.__class__ = Application
