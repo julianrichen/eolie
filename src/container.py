@@ -184,6 +184,8 @@ class Container(Gtk.Paned):
             self.window.toolbar.actions.set_actions(view)
         if title:
             El().history.add(title, uri)
+            if uri != view.loaded_uri:
+                El().history.add(title, view.loaded_uri)
 
     def __on_enter_fullscreen(self, view):
         """
