@@ -68,6 +68,7 @@ class Application(Gtk.Application):
         GLib.set_application_name('Eolie')
         GLib.set_prgname('eolie')
         self.connect('activate', self.__on_activate)
+        self.connect('command-line', self.__on_command_line)
         self.register(None)
         if self.get_is_remote():
             Gdk.notify_startup_complete()
@@ -148,7 +149,6 @@ class Application(Gtk.Application):
                 window.setup_menu(menu)
             window.connect('delete-event', self.__on_delete_event)
             window.show()
-            window.container.add_web_view("google.fr", True)
             self.__windows.append(window)
 
     def prepare_to_exit(self, action=None, param=None, exit=True):
@@ -175,6 +175,9 @@ class Application(Gtk.Application):
         for window in self.__windows:
             if window.is_active():
                 return window
+        # Fallback
+        if self.__windows:
+            return self.__windows[0]
         return None
 
     @property
@@ -188,6 +191,27 @@ class Application(Gtk.Application):
 #######################
 # PRIVATE             #
 #######################
+    def __on_command_line(self, app, app_cmd_line):
+        """
+            Handle command line
+            @param app as Gio.Application
+            @param options as Gio.ApplicationCommandLine
+        """
+        self.__externals_count = 0
+        args = app_cmd_line.get_arguments()
+        options = app_cmd_line.get_options_dict()
+        if options.contains('debug'):
+            pass
+        else:
+            active_window = self.active_window
+            if len(args) > 1:
+                for uri in args[1:]:
+                    active_window.container.add_web_view(uri, True)
+                active_window.present()
+            else:
+                active_window.container.add_web_view("google.fr", True)
+        return 0
+
     def __on_delete_event(self, widget, event):
         """
             Exit application
