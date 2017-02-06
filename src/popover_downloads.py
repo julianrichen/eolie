@@ -101,25 +101,10 @@ class DownloadsPopover(Gtk.Popover):
         self.__listbox.set_placeholder(builder.get_object('placeholder'))
         self.__listbox.bind_model(self.__model,
                                   self.__on_item_create)
+        self.__scrolled = builder.get_object('scrolled')
         self.add(builder.get_object('widget'))
         self.connect('map', self.__on_map)
         for download in El().downloads_manager.get_all():
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
-            self.__model.append(download)
             self.__model.append(download)
 
 #######################
@@ -134,7 +119,21 @@ class DownloadsPopover(Gtk.Popover):
             Resize
             @param widget as Gtk.Widget
         """
-        self.set_size_request(400, 500)
+        self.set_size_request(400, -1)
+
+    def __on_child_size_allocate(self, widget, allocation=None):
+        """
+            Update popover height request
+            @param widget as Gtk.Widget
+            @param allocation as Gdk.Rectangle
+        """
+        height = 0
+        for child in self.__listbox.get_children():
+            height += allocation.height
+        size = El().window.get_size()
+        if height > size[1] * 0.6:
+            height = size[1] * 0.6
+        self.__scrolled.set_size_request(400, height)
 
     def __on_item_create(self, download):
         """
@@ -142,4 +141,5 @@ class DownloadsPopover(Gtk.Popover):
             @param download as WebKit2.Download
         """
         child = Row(download)
+        child.connect('size-allocate', self.__on_child_size_allocate)
         return child
