@@ -108,6 +108,10 @@ class SettingsDialog:
         storage = El().settings.get_enum('cookie-storage')
         cookies_combo.set_active_id(str(storage))
 
+        tracking_check = builder.get_object('tracking_check')
+        tracking_check.set_active(
+                                El().settings.get_value('do-not-track'))
+
     def show(self):
         """
             Show dialog
@@ -117,6 +121,14 @@ class SettingsDialog:
 #######################
 # PROTECTED           #
 #######################
+    def _on_tracking_toggled(self, button):
+        """
+            Save state
+            @param button as Gtk.ToggleButton
+        """
+        El().settings.set_value('do-not-track',
+                                GLib.Variant('b', button.get_active()))
+
     def _on_cookies_changed(self, combo):
         """
             Save engine

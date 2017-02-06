@@ -86,5 +86,10 @@
             <summary>Cookie storage type</summary>
             <description></description>
         </key>
+	    <key type="b" name="do-not-track">
+            <default>true</default>
+            <summary>Tell websites I do not want to be tracked</summary>
+            <description></description>
+        </key>
     </schema>
 </schemalist>

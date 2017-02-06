@@ -498,6 +498,7 @@
                 <property name="halign">start</property>
                 <property name="margin_left">15</property>
                 <property name="draw_indicator">True</property>
+                <signal name="toggled" handler="_on_tracking_toggled" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>
