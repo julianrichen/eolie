@@ -86,6 +86,13 @@ class SidebarChild(Gtk.ListBoxRow):
         """
             Destroy self
         """
+        if event.button == 2:
+            self.destroy()
+
+    def _on_close_button_press(self, button, event):
+        """
+            Destroy self
+        """
         self.destroy()
 
     def _on_enter_notify(self, eventbox, event):

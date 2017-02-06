@@ -5,6 +5,7 @@
   <object class="GtkEventBox" id="widget">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
+    <signal name="button-press-event" handler="_on_button_press" swapped="no"/>
     <signal name="enter-notify-event" handler="_on_enter_notify" swapped="no"/>
     <signal name="leave-notify-event" handler="_on_leave_notify" swapped="no"/>
     <child>
@@ -52,7 +53,7 @@
                 <property name="halign">end</property>
                 <property name="valign">center</property>
                 <property name="vexpand">True</property>
-                <signal name="button-press-event" handler="_on_button_press" swapped="no"/>
+                <signal name="button-press-event" handler="_on_close_button_press" swapped="no"/>
                 <child>
                   <object class="GtkImage" id="image_close">
                     <property name="width_request">22</property>
