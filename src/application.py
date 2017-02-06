@@ -62,7 +62,7 @@ class Application(Gtk.Application):
                     GLib.setenv('SSL_CERT_FILE', path, True)
                     break
         self.__extension_dir = extension_dir
-        self.window = None
+        self.__windows = []
         self.debug = False
         self.cursors = {}
         GLib.set_application_name('Eolie')
@@ -137,18 +137,19 @@ class Application(Gtk.Application):
         """
         Gtk.Application.do_startup(self)
 
-        if not self.window:
+        if not self.__windows:
             self.init()
             menu = self.__setup_app_menu()
             if self.prefers_app_menu():
                 self.set_app_menu(menu)
-                self.window = Window()
+                window = Window()
             else:
-                self.window = Window()
-                self.window.setup_menu(menu)
-            self.window.connect('delete-event', self.__on_delete_event)
-            self.window.show()
-            self.window.container.add_web_view("google.fr", True)
+                window = Window()
+                window.setup_menu(menu)
+            window.connect('delete-event', self.__on_delete_event)
+            window.show()
+            window.container.add_web_view("google.fr", True)
+            self.__windows.append(window)
 
     def prepare_to_exit(self, action=None, param=None, exit=True):
         """
@@ -162,7 +163,27 @@ class Application(Gtk.Application):
         """
             Quit Eolie
         """
-        self.window.destroy()
+        for window in self.__windows:
+            window.destroy()
+
+    @property
+    def active_window(self):
+        """
+            Get active window
+            @return Window
+        """
+        for window in self.__windows:
+            if window.is_active():
+                return window
+        return None
+
+    @property
+    def windows(self):
+        """
+            Get windows
+            @return [Window]
+        """
+        return self.__windows
 
 #######################
 # PRIVATE             #
@@ -192,7 +213,9 @@ class Application(Gtk.Application):
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/AboutDialog.ui')
         about = builder.get_object('about_dialog')
-        about.set_transient_for(self.window)
+        window = self.active_window
+        if window is not None:
+            about.set_transient_for(window)
         about.connect("response", self.__about_response)
         about.show()
 
@@ -205,8 +228,11 @@ class Application(Gtk.Application):
         try:
             builder = Gtk.Builder()
             builder.add_from_resource('/org/gnome/Eolie/Shortcuts.ui')
-            builder.get_object('shortcuts').set_transient_for(self.window)
-            builder.get_object('shortcuts').show()
+            shortcuts = builder.get_object('shortcuts')
+            window = self.active_window
+            if window is not None:
+                shortcuts.set_transient_for(window)
+            shortcuts.show()
         except:  # GTK < 3.20
             self.__help(action, param)
 
@@ -258,10 +284,11 @@ class Application(Gtk.Application):
 
     def __on_activate(self, application):
         """
-            Call default handler
+            Call default handler, raise last window
             @param application as Gio.Application
         """
-        self.window.present()
+        if self.__windows:
+            self.__windows[-1].present()
 
     def __on_shortcut_action(self, action, param):
         """
@@ -269,10 +296,13 @@ class Application(Gtk.Application):
             @param action as Gio.SimpleAction
             @param param as GLib.Variant
         """
+        window = self.active_window
+        if window is None:
+            return
         string = param.get_string()
         if string == "uri":
-            self.window.toolbar.title.focus_entry()
+            window.toolbar.title.focus_entry()
         elif string == "new_page":
-            self.window.container.add_web_view("google.fr", True)
+            window.container.add_web_view("google.fr", True)
         elif string == "close_page":
-            self.window.container.sidebar.current.destroy()
+            window.container.sidebar.current.destroy()

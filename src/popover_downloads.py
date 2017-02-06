@@ -130,7 +130,7 @@ class DownloadsPopover(Gtk.Popover):
         height = 0
         for child in self.__listbox.get_children():
             height += allocation.height
-        size = El().window.get_size()
+        size = El().active_window.get_size()
         if height > size[1] * 0.6:
             height = size[1] * 0.6
         self.__scrolled.set_size_request(400, height)

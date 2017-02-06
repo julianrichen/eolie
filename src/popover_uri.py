@@ -265,8 +265,8 @@ class UriPopover(Gtk.Popover):
                 if selected is not None:
                     uri = selected.item.get_property("uri")
                     if uri:
-                        El().window.toolbar.title.hide_popover()
-                        El().window.container.current.load_uri(uri)
+                        El().active_window.toolbar.title.hide_popover()
+                        El().active_window.container.current.load_uri(uri)
                 return True
             else:
                 self.__input = Input.NONE
@@ -379,9 +379,9 @@ class UriPopover(Gtk.Popover):
         item_id = item.get_property("id")
         if item_id == BookmarksType.URI:
             if button == 1:
-                El().window.container.current.load_uri(uri)
+                El().active_window.container.current.load_uri(uri)
             else:
-                El().window.container.add_web_view(uri, True)
+                El().active_window.container.add_web_view(uri, True)
         else:
             self.__set_bookmarks(item_id)
 
@@ -393,7 +393,7 @@ class UriPopover(Gtk.Popover):
             @param item as Item
         """
         if item.get_property("id") == BookmarksType.URI:
-            El().window.toolbar.title.hide_popover()
+            El().active_window.toolbar.title.hide_popover()
         # Needed to not conflict with popover hidding
         GLib.idle_add(self.__handle_click, event.button, item)
 
@@ -407,7 +407,7 @@ class UriPopover(Gtk.Popover):
         self.__bookmarks_box.get_style_context().remove_class('input')
         self.__tags_box.get_style_context().remove_class('input')
         self.__stack.set_visible_child_name('bookmarks')
-        size = El().window.get_size()
+        size = El().active_window.get_size()
         self.set_size_request(size[0]*0.5, size[1]*0.7)
         self.__scrolled_bookmarks.set_size_request(size[1]*0.7*0.5, -1)
 

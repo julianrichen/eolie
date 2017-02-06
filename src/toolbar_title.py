@@ -80,7 +80,7 @@ class ToolbarTitle(Gtk.Bin):
             self.__popover.hide()
             self.__keywords_cancellable.cancel()
             self.__keywords_cancellable.reset()
-            El().window.set_focus(None)
+            El().active_window.set_focus(None)
 
     def focus_entry(self):
         """
@@ -186,9 +186,9 @@ class ToolbarTitle(Gtk.Bin):
             @param event as Gdk.Event
         """
         if self.__action_image.get_icon_name()[0] == 'view-refresh-symbolic':
-            El().window.container.current.reload()
+            El().active_window.container.current.reload()
         else:
-            El().window.container.current.stop_loading()
+            El().active_window.container.current.stop_loading()
 
     def _on_action_enter_notify(self, eventbox, event):
         """
@@ -214,7 +214,7 @@ class ToolbarTitle(Gtk.Bin):
         uri = entry.get_text()
         if El().search.is_search(uri):
             uri = El().search.get_search_uri(uri)
-        El().window.container.load_uri(uri)
+        El().active_window.container.load_uri(uri)
 
 #######################
 # PRIVATE             #

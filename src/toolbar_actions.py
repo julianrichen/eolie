@@ -50,18 +50,19 @@ class ToolbarActions(Gtk.Bin):
             Go backward on current view
             @param button as Gtk.Button
         """
-        El().window.container.current.go_back()
+        El().active_window.container.current.go_back()
 
     def _on_forward_button_clicked(self, button):
         """
             aa
             @param button as Gtk.Button
         """
-        El().window.container.current.go_forward()
+        El().active_window.container.current.go_forward()
 
     def _on_new_button_clicked(self, button):
         """
             Add a new web view
             @param button as Gtk.Button
         """
-        El().window.container.add_web_view("http://www.google.fr", True)
+        El().active_window.container.add_web_view("http://www.google.fr",
+                                                  True)

@@ -34,7 +34,7 @@ class Container(Gtk.Paned):
         self.__stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
         self.__stack.set_transition_duration(150)
         self.__stack.show()
-        self.__stack_sidebar = StackSidebar(self.__stack)
+        self.__stack_sidebar = StackSidebar(self)
         self.__stack_sidebar.show()
         self.__progress = Gtk.ProgressBar()
         self.__progress.get_style_context().add_class('progressbar')
@@ -100,12 +100,28 @@ class Container(Gtk.Paned):
         return self.__stack.get_children()
 
     @property
+    def stack(self):
+        """
+            Get stack
+            @return Gtk.Stack
+        """
+        return self.__stack
+
+    @property
     def current(self):
         """
             Current view
             @return WebView
         """
         return self.__stack.get_visible_child()
+
+    @property
+    def window(self):
+        """
+            Get window for self
+            @return Window
+        """
+        return self.get_toplevel()
 
 #######################
 # PRIVATE             #
@@ -115,12 +131,12 @@ class Container(Gtk.Paned):
             Update window
             @param view as WebView
         """
-        El().window.toolbar.title.set_uri(view.get_uri())
+        self.window.toolbar.title.set_uri(view.get_uri())
         if view.is_loading():
             self.__progress.show()
         else:
             self.__progress.hide()
-            El().window.toolbar.title.set_title(view.get_title())
+            self.window.toolbar.title.set_title(view.get_title())
 
     def __on_button_press(self, widget, event):
         """
@@ -128,7 +144,7 @@ class Container(Gtk.Paned):
             @param widget as Gtk.Widget
             @param event as Gdk.Event
         """
-        El().window.toolbar.title.hide_popover()
+        self.window.toolbar.title.hide_popover()
 
     def __on_estimated_load_progress(self, view, value):
         """
@@ -146,7 +162,7 @@ class Container(Gtk.Paned):
             @param uri as str
         """
         if view == self.current:
-            El().window.toolbar.title.set_uri(view.get_uri())
+            self.window.toolbar.title.set_uri(view.get_uri())
 
     def __on_title_changed(self, view, event):
         """
@@ -160,10 +176,10 @@ class Container(Gtk.Paned):
         title = view.get_title()
         if view == self.current:
             if title:
-                El().window.toolbar.title.set_title(title)
+                self.window.toolbar.title.set_title(title)
             else:
-                El().window.toolbar.title.set_title(uri)
-            El().window.toolbar.actions.set_actions(view)
+                self.window.toolbar.title.set_title(uri)
+            self.window.toolbar.actions.set_actions(view)
         if title:
             El().history.add(title, uri)
 
@@ -185,7 +201,7 @@ class Container(Gtk.Paned):
             @param view as WebView
             @param event as WebKit2.LoadEvent
         """
-        El().window.toolbar.title.on_load_changed(view, event)
+        self.window.toolbar.title.on_load_changed(view, event)
         if event == WebKit2.LoadEvent.STARTED:
             self.__progress.show()
         if event == WebKit2.LoadEvent.FINISHED:
