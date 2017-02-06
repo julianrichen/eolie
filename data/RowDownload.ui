@@ -51,7 +51,7 @@
         <property name="relief">none</property>
         <signal name="clicked" handler="_on_cancel_button_clicked" swapped="no"/>
         <style>
-          <class name="flat-button"/>
+          <class name="rounded-button"/>
         </style>
       </object>
       <packing>

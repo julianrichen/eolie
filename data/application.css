@@ -75,6 +75,11 @@
     background-color: transparent;
 }
 
-.flat-button {
+.rounded-button {
     border-radius: 20px;
+}
+
+.no-padding {
+    min-width: 28px;
+    padding: 2px;
 }

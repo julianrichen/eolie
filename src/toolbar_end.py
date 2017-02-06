@@ -16,6 +16,19 @@ from eolie.define import El
 from eolie.popover_downloads import DownloadsPopover
 
 
+class ProgressBar(Gtk.ProgressBar):
+    """
+        Simple progress bar with width contraint and event pass through
+    """
+    def __init__(self, parent):
+        Gtk.ProgressBar.__init__(self)
+        self.__parent = parent
+        self.set_property('valign', Gtk.Align.END)
+
+    def do_get_preferred_width(self):
+        return (24, 24)
+
+
 class ToolbarEnd(Gtk.Bin):
     """
         Toolbar end
@@ -26,9 +39,21 @@ class ToolbarEnd(Gtk.Bin):
             Init toolbar
         """
         Gtk.Bin.__init__(self)
+        self.__timeout_id = None
         builder = Gtk.Builder()
         builder.add_from_resource('/org/gnome/Eolie/ToolbarEnd.ui')
         builder.connect_signals(self)
+        self.__download_button = builder.get_object('download_button')
+        eventbox = Gtk.EventBox()
+        eventbox.connect('button-release-event', self.__on_event_release_event)
+        eventbox.show()
+        self.__progress = ProgressBar(builder.get_object('download_button'))
+        if El().downloads_manager.get_all():
+            self._progress.show()
+        El().downloads_manager.connect('download-changed',
+                                       self.__on_download_changed)
+        eventbox.add(self.__progress)
+        builder.get_object('overlay').add_overlay(eventbox)
         if El().settings.get_value('adblock'):
             builder.get_object(
                          'adblock_button').get_style_context().add_class('red')
@@ -62,3 +87,39 @@ class ToolbarEnd(Gtk.Bin):
 #######################
 # PRIVATE             #
 #######################
+    def __update_progress(self, downloads_manager):
+        """
+            Update progress
+        """
+        fraction = 0.0
+        nb_downloads = 0
+        for download in downloads_manager.get_all():
+            nb_downloads += 1
+            fraction += download.get_estimated_progress()
+        if nb_downloads:
+            self.__progress.set_fraction(fraction/nb_downloads)
+        return True
+
+    def __on_event_release_event(self, widget, event):
+        """
+            Forward event to button
+            @param widget as Gtk.Widget
+            @param event as Gdk.Event
+        """
+        self.__download_button.clicked()
+
+    def __on_download_changed(self, downloads_manager):
+        """
+            Update progress bar
+            @param downloads manager as DownloadsManager
+        """
+        if downloads_manager.get_all():
+            if self.__timeout_id is None:
+                self.__progress.show()
+                self.__timeout_id = GLib.timeout_add(1000,
+                                                     self.__update_progress,
+                                                     downloads_manager)
+        else:
+            self.__progress.hide()
+            GLib.source_remove(self.__timeout_id)
+            self.__timeout_id = None

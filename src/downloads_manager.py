@@ -10,16 +10,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from gi.repository import GObject
 
-class DownloadsManager:
+
+class DownloadsManager(GObject.GObject):
     """
         Downloads Manager
     """
+    __gsignals__ = {
+        'download-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
+    }
 
     def __init__(self):
         """
             Init download manager
         """
+        GObject.GObject.__init__(self)
         self.__downloads = []
 
     def add(self, download):
@@ -30,6 +36,7 @@ class DownloadsManager:
         self.__downloads.append(download)
         download.connect('finished', self.__on_finished)
         download.connect('failed', self.__on_failed)
+        self.emit('download-changed')
         # download.connect('decide-destination', self.__on_decide_destination)
 
     def get_all(self):
@@ -55,6 +62,7 @@ class DownloadsManager:
         """
         if download in self.__downloads:
             self.__downloads.remove(download)
+        self.emit('download-changed')
 
     def __on_failed(self, download, error):
         """
@@ -64,3 +72,4 @@ class DownloadsManager:
         print("DownloadManager::__on_failed:", error)
         if download in self.__downloads:
             self.__downloads.remove(download)
+        self.emit('download-changed')
